@@ -1,7 +1,7 @@
 /**
  * 
  */
-package dialogos;
+package dialogs;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -12,7 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import modelo.Empresa;

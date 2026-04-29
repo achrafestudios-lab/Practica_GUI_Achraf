@@ -38,7 +38,7 @@ public class Empresa {
 	/**
 	 * Devuelve la posici�n en la que se encuentra un trabajador
 	 * busc�ndolo por dni
-	 * @param t
+	 * @param codigo
 	 * @return
 	 */
 	public int devolverPosicion(int codigo){

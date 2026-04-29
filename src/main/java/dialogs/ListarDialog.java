@@ -1,7 +1,7 @@
 /**
  * 
  */
-package dialogos;
+package dialogs;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
