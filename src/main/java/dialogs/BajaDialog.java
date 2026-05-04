@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 
 import modelo.Empresa;
 
+import static dao.AccesoTrabajador.eliminarTrabajadorId;
+
 /**
  * 
  * @author usuario
@@ -25,11 +27,18 @@ public class BajaDialog extends JDialog implements ActionListener {
 
 	JButton aceptar;
 	JButton cancelar;
-	JLabel identificador;
-	JTextField areaIdentificador;
-	JPanel panel;
+
 	JPanel panelBotones;
 	JLabel texto;
+
+	JLabel identificador;
+	JTextField areaIdentificador;
+	int id = 0;
+	JPanel panel;
+
+	JPanel pIdentificador;
+
+
 
 	Empresa empresa;
 
@@ -37,7 +46,7 @@ public class BajaDialog extends JDialog implements ActionListener {
 		this.empresa = empresa;
 
 		setResizable(false);
-		// t�tulo del di�log
+		// titulo del dialog
 		setTitle("Baja Trabajador");
 		setSize(300, 200);
 		setLayout(new FlowLayout());
@@ -52,8 +61,8 @@ public class BajaDialog extends JDialog implements ActionListener {
 		add(panelBotones);
 
 		identificador = new JLabel("Identificador");
-		panel.add(identificador);
 		areaIdentificador = new JTextField(15);
+		panel.add(identificador);
 		panel.add(areaIdentificador);
 
 		aceptar = new JButton("Aceptar");
@@ -70,25 +79,28 @@ public class BajaDialog extends JDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 
 		if (e.getSource() == aceptar) {
-			int respuesta = JOptionPane.showConfirmDialog(null, "�Desea dar de baja el trabajador?", "Borrar",
+			int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea dar de baja el trabajador?", "Borrar",
 					JOptionPane.YES_NO_OPTION);
 			switch (respuesta) {
 			case JOptionPane.YES_OPTION:
 				try {
-					// Operaciones en caso afirmativo
-					if (empresa.bajaTrabajador(Integer.parseInt(areaIdentificador.getText()))) {
-						JOptionPane.showMessageDialog(this, "El trabajador se ha eliminado correctamente");
-					} else {
-						JOptionPane.showMessageDialog(null, "El trabajador no se encuentra en la lista", "Error",
-								JOptionPane.ERROR_MESSAGE);
+					id = Integer.parseInt(areaIdentificador.getText());
+
+					if (comprobarErrores()) {
+						// Operaciones en caso afirmativo
+						if (eliminarTrabajadorId(id)) {
+							JOptionPane.showMessageDialog(this, "El trabajador se ha eliminado correctamente");
+						} else {
+							JOptionPane.showMessageDialog(null, "El trabajador no se encuentra en la a base de datos", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						}
 					}
 
 					break;
 				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, "El ID debe ser un n�mero entero", "Error",
+					JOptionPane.showMessageDialog(null, "El ID debe ser un numero entero positivo > 0", "Error",
 							JOptionPane.ERROR_MESSAGE);
 				}
 
@@ -101,5 +113,15 @@ public class BajaDialog extends JDialog implements ActionListener {
 		}
 
 	}
+
+	public boolean comprobarErrores() {
+		if (id < 1) {
+			JOptionPane.showMessageDialog(null, "El ID debe ser un numero entero positivo", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
+	}
+
 
 }

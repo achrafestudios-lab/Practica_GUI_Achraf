@@ -8,7 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import dao.AccesoTrabajador;
+import exception.TrabajadorException;
 import modelo.Trabajador;
 
 /**
@@ -22,7 +25,7 @@ public class FicheroDatos {
 	 * @param ruta
 	 * @param trabajadores
 	 */
-	public static void escribirTrabajadores(String ruta, ArrayList<Trabajador> trabajadores){
+	public static void escribirTrabajadores(String ruta, List<Trabajador> trabajadores){
 		
 		DataOutputStream fichero = null;
 		try {
@@ -35,13 +38,14 @@ public class FicheroDatos {
 				fichero.writeUTF(trabajadores.get(i).getDireccion());
 				fichero.writeUTF(trabajadores.get(i).getTelefono());
 				fichero.writeUTF(trabajadores.get(i).getPuesto());
-			}		
+			}
+
 		} 
 		catch (FileNotFoundException e1){
 			System.out.printf("Error al abrir fichero para escritura");
 		}
 		catch (IOException e){ 
-			System.out.printf("Error al escribir en el fichero%n"); 
+			System.out.printf("Error al escribir en el fichero");
 		} 
 		finally{ 
 			try{
@@ -91,12 +95,30 @@ public class FicheroDatos {
 			try {
 				ficheroDatos.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 		}
 		
 		return trabajadoresLeidos;
 	}
+
+	public static void cargarDatosFicheroEnBaseDatos(List<Trabajador> TrabajdoresFicheroDAT) throws TrabajadorException {
+
+		for (Trabajador t : TrabajdoresFicheroDAT) {
+			AccesoTrabajador.insertarTrabajador(t);
+		}
+
+		DataInputStream ficheroDatos=null;
+	}
+
+	public static void cargarDatosBaseDatosEnFichero(List<Trabajador> TrabajdoresFicheroDAT) throws TrabajadorException {
+
+		for (Trabajador t : TrabajdoresFicheroDAT) {
+			AccesoTrabajador.insertarTrabajador(t);
+		}
+
+		DataInputStream ficheroDatos=null;
+	}
+
 
 }

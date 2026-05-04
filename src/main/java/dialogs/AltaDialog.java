@@ -20,6 +20,8 @@ import javax.swing.JTextField;
 import modelo.Empresa;
 import modelo.Trabajador;
 
+import static dao.AccesoTrabajador.insertarTrabajador;
+
 /**
  * 
  * @author usuario
@@ -46,6 +48,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	JComboBox comboPuesto;
 	JButton aceptar;
 	JButton cancelar;
+
 	/**
 	 * Variables a las que se pasar� el contenido de los JTextField y del combo box
 	 */
@@ -71,7 +74,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	public AltaDialog(Empresa empresa) {
 		this.empresa = empresa;
 		setResizable(false);
-		// t�tulo del di�log
+		// titulo del dialog
 		setTitle("Alta Trabajador");
 		setSize(300, 350);
 		setLayout(new FlowLayout());
@@ -169,28 +172,33 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
 		puesto = comboPuesto.getSelectedItem().toString();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+
 		if (e.getSource() == aceptar) {
 			try {
 
-				id = Integer.parseInt(areaIdentificador.getText());
 				dni = areaDni.getText();
 				nombre = areaNombre.getText();
 				apellidos = areaApellidos.getText();
 				direccion = areaDireccion.getText();
 				telefono = areaTelefono.getText();
+
+
 				if (comprobarErrores()) {
-					Trabajador t = new Trabajador(id, dni, nombre, apellidos, direccion, telefono, puesto);
-					if (empresa.altaTrabajador(t)) {
-						JOptionPane.showMessageDialog(null, "Datos introducidos correctamente");
-					} else {
-						JOptionPane.showMessageDialog(null, "El ID del trabajador que quiere introducir ya existe",
+
+					Trabajador t = new Trabajador(0, dni, nombre, apellidos, direccion, telefono, puesto);
+					int insertar = insertarTrabajador(t);
+
+					if (insertar == 1) {
+						JOptionPane.showMessageDialog(null, "Nuevo trabajador insertado correctamente");
+					} else if (insertar == 2){
+						JOptionPane.showMessageDialog(null, "Trabajador ya existente, datos modificados correctamente");
+					}else {
+						JOptionPane.showMessageDialog(null, "El ID del trabajador que quiere introducir ya existe y no has echo modificaciones",
 								"Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
@@ -207,17 +215,13 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	}
 
 	/**
-	 * M�todo que comprueba si no hay ning�n campo vac�o o si la longitud de los
+	 * Metodo que comprueba si no hay ning�n campo vac�o o si la longitud de los
 	 * campos es la correcta
 	 * 
 	 * @return
 	 */
 	public boolean comprobarErrores() {
-		if (id < 1) {
-			JOptionPane.showMessageDialog(null, "El ID debe ser un n�mero entero positivo", "Error",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		} else if (dni.equals("") || dni.length() != 9) {
+		if (dni.equals("") || dni.length() != 9) {
 			JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else if (nombre.equals("")) {

@@ -5,29 +5,37 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import dialogs.AltaDialog;
-import dialogs.BajaDialog;
-import dialogs.ListarDialog;
+import dao.AccesoTrabajador;
+import dialogs.*;
 //import dialogs.ModificaDialog;
 //import dialogs.VerDialog;
+import exception.TrabajadorException;
 import ficheros.FicheroDatos;
 import modelo.Empresa;
 import modelo.Trabajador;
 
+import static dao.AccesoTrabajador.insertarTrabajadores;
+import static dao.AccesoTrabajador.obtenerTrabajadoresBaseDatos;
+import static ficheros.FicheroDatos.*;
+
+
 /**
  * 
- * @author usuario
+ * @author Achraf Ait
  *
  */
 public class EmpresaGUI extends JFrame implements ActionListener {
+	String rutaArchivoDat ="src\\main\\resources\\ficheroDatos\\empresa.dat";
+	String rutaFotosPrograma = "src/main/resources/images";
+	List<Trabajador> trabaj = obtenerTrabajadoresBaseDatos();
 
 	Empresa empresa;
-
 	JButton altaTrabajador;
 	JButton bajaTrabajador;
 	JButton modificaTrabajador;
@@ -39,8 +47,21 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 		super("Gestión de personal");
 
 		// Carga los trabajadores leidos de un fichero a memoria
-		ArrayList<Trabajador> trabaj = FicheroDatos.obtenerTrabajadores("ficheroDatos\\empresa.dat");
-		empresa = new Empresa(trabaj);
+		ArrayList<Trabajador> trabajDAT = FicheroDatos.obtenerTrabajadores(rutaArchivoDat);
+
+		try {
+			cargarDatosFicheroEnBaseDatos(trabajDAT);
+
+		} catch (TrabajadorException e) {
+			throw new RuntimeException(e);
+		}
+
+
+
+//		escribirTrabajadores(rutaArchivoDat, obtenerTrabajadoresBaseDatos());
+
+
+        empresa = new Empresa(trabaj);
 
 		// Tamaño JFrame
 		setSize(800, 750);
@@ -52,33 +73,34 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 		// Se añade una imagen para cada botón
 		altaTrabajador = new JButton("Añadir Trabajador");
 		altaTrabajador.addActionListener(this);
-		altaTrabajador.setIcon(new ImageIcon("images/addUser.png"));
+		altaTrabajador.setIcon(new ImageIcon( rutaFotosPrograma + "/addUser.png"));
 		add(altaTrabajador);
 
 		bajaTrabajador = new JButton("Borrar Trabajador");
 		bajaTrabajador.addActionListener(this);
-		bajaTrabajador.setIcon(new ImageIcon("images/removeUser.png"));
+		bajaTrabajador.setIcon(new ImageIcon(rutaFotosPrograma + "/removeUser.png"));
 		add(bajaTrabajador);
 
 		modificaTrabajador = new JButton("Modificar Trabajador");
 		modificaTrabajador.addActionListener(this);
-		modificaTrabajador.setIcon(new ImageIcon("images/editUser.png"));
+		modificaTrabajador.setIcon(new ImageIcon( rutaFotosPrograma + "/editUser.png"));
 		add(modificaTrabajador);
 
 		buscaTrabajador = new JButton("Buscar Trabajador");
 		buscaTrabajador.addActionListener(this);
-		buscaTrabajador.setIcon(new ImageIcon("images/searchUser.png"));
+		buscaTrabajador.setIcon(new ImageIcon(rutaFotosPrograma + "/searchUser.png"));
 		add(buscaTrabajador);
 
 		listarTrabajadores = new JButton("Listar Trabajadores");
 		listarTrabajadores.addActionListener(this);
-		listarTrabajadores.setIcon(new ImageIcon("images/list.png"));
+		listarTrabajadores.setIcon(new ImageIcon(rutaFotosPrograma + "/list.png"));
 		add(listarTrabajadores);
 
 		salir = new JButton("Salir");
 		salir.addActionListener(this);
-		salir.setIcon(new ImageIcon("images/exit.png"));
+		salir.setIcon(new ImageIcon(rutaFotosPrograma +  "/exit.png"));
 		add(salir);
+
 		// Visible
 		setVisible(true);
 	}
@@ -94,16 +116,21 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 		} else if (e.getSource() == bajaTrabajador) {
 			new BajaDialog(empresa);
 		} else if (e.getSource() == modificaTrabajador) {
-			// new ModificaDialog(empresa);
+			new ModificaDialog(empresa);
 		} else if (e.getSource() == buscaTrabajador) {
-			// new VerDialog(empresa);
+			new VerDialog(empresa);
 		} else if (e.getSource() == listarTrabajadores) {
 			new ListarDialog(empresa);
 		}
 		// Cuando se sale se vuelca a fichero.
 		else if (e.getSource() == salir) {
-			FicheroDatos.escribirTrabajadores("ficheroDatos\\empresa.dat", empresa.getTrabajadores());
-			System.exit(0);
+			FicheroDatos.escribirTrabajadores(rutaArchivoDat, empresa.getTrabajadores());
+            try {
+                insertarTrabajadores(trabaj);
+            } catch (TrabajadorException ex) {
+				System.out.println(ex.getMessage());;
+            }
+            System.exit(0);
 		}
 	}
 
@@ -111,7 +138,6 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		new EmpresaGUI();
 	}
 

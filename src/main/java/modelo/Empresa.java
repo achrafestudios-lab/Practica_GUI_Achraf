@@ -4,6 +4,9 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static dao.AccesoTrabajador.obtenerTrabajadoresBaseDatos;
 
 /**
  * @author alumno
@@ -11,13 +14,13 @@ import java.util.ArrayList;
  */
 public class Empresa {
 	
-	ArrayList <Trabajador> trabajadores;
+	List <Trabajador> trabajadores;
 	
 
 	/**
 	 * @param trabajadores
 	 */
-	public Empresa(ArrayList<Trabajador> trabajadores) {
+	public Empresa(List<Trabajador> trabajadores) {
 		this.trabajadores = trabajadores;
 	}
 	
@@ -63,7 +66,7 @@ public class Empresa {
 	}
 	/**
 	 * Da de baja un trabajador busc�ndolo por c�digo
-	 * @param t
+	 * @param codigo
 	 */
 	public boolean bajaTrabajador(int codigo){
 		int posicion = devolverPosicion(codigo);
@@ -75,7 +78,7 @@ public class Empresa {
 	}
 	/**
 	 * Devuelve un trabajador
-	 * @param dni
+	 * @param codigo
 	 * @return
 	 */
 	public Trabajador buscarTrabajador(int codigo){		
@@ -103,9 +106,12 @@ public class Empresa {
 	
 	/**
 	 * Devuelve una matriz que se utilizar� para listar los trabajadores
-	 * @return
+	 * @return Da una matriz con los trabajadores por filas
 	 */
 	public String[][] listarTrabajadores(){
+
+		setTrabajadores(obtenerTrabajadoresBaseDatos());
+
 		String [][] datos = new String[trabajadores.size()][7];
 		for (int i=0; i<trabajadores.size(); i++){
 			String[] fila = new String [7];
@@ -123,11 +129,11 @@ public class Empresa {
 		return datos;
 	}
 
-	public ArrayList<Trabajador> getTrabajadores() {
+	public List<Trabajador> getTrabajadores() {
 		return trabajadores;
 	}
 
-	public void setTrabajadores(ArrayList<Trabajador> trabajadores) {
+	public void setTrabajadores(List<Trabajador> trabajadores) {
 		this.trabajadores = trabajadores;
 	}
 }

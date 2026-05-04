@@ -1,6 +1,3 @@
-/**
- * 
- */
 package dialogs;
 
 import java.awt.Dimension;
@@ -8,11 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 
 import modelo.Empresa;
 
@@ -30,19 +23,21 @@ public class ListarDialog extends JDialog implements ActionListener {
 	public ListarDialog(Empresa empresa) {
 		this.empresa = empresa;
 
+
 		setResizable(false);
-		// t�tulo del di�log
+		// titulo del dialog
 		setTitle("Listado Trabajadores");
-		// tama�o
+		// tamaño
 		setSize(750, 700);
 		setLayout(new FlowLayout());
-		// colocaci�n en el centro de la pantalla
+		// colocacion en el centro de la pantalla
 		setLocationRelativeTo(null);
 
 		// Crea un JTable, cada fila será un trabajador
-		String[] columnas = { "Identificador", "DNI", "Nombre", "Apellidos", "Direcci�n", "Tel�fono", "Puesto" };
+		String[] columnas = { "Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto" };
 		String[][] datos = empresa.listarTrabajadores();
 		tabla = new JTable(datos, columnas);
+
 		// Mete la tabla en un JCrollPane
 		JScrollPane jsp = new JScrollPane(tabla);
 		jsp.setPreferredSize(new Dimension(700, 600));
@@ -57,7 +52,6 @@ public class ListarDialog extends JDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getSource() == cerrar) {
 			dispose();
 		}
