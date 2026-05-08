@@ -32,8 +32,8 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	/**
 	 * Elementos del JFrame
 	 */
-	JLabel etiquetaIdentificador;
-	JTextField areaIdentificador;
+//	JLabel etiquetaIdentificador;
+//	JTextField areaIdentificador;
 	JLabel etiquetaDni;
 	JTextField areaDni;
 	JLabel etiquetaNombre;
@@ -52,7 +52,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	/**
 	 * Variables a las que se pasar� el contenido de los JTextField y del combo box
 	 */
-	int id = 0;
+//	int id = 0;
 	String dni = "";
 	String nombre = "";
 	String apellidos = "";
@@ -60,7 +60,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	String telefono = "";
 	String puesto = "";
 
-	JPanel pIdentificador;
+//	JPanel pIdentificador;
 	JPanel pDni;
 	JPanel pNombre;
 	JPanel pApellidos;
@@ -82,7 +82,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 		setLocationRelativeTo(null);
 
 		// una fila por JPanel
-		pIdentificador = new JPanel();
+//		pIdentificador = new JPanel();
 		pDni = new JPanel();
 		pNombre = new JPanel();
 		pApellidos = new JPanel();
@@ -92,11 +92,11 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 		pBotones = new JPanel();
 
 		// Se crean los elementos y se añaden
-		etiquetaIdentificador = new JLabel("Identificador");
-		areaIdentificador = new JTextField(15);
+//		etiquetaIdentificador = new JLabel("Identificador");
+//		areaIdentificador = new JTextField(15);
 		// Se añaden al JPanel
-		pIdentificador.add(etiquetaIdentificador);
-		pIdentificador.add(areaIdentificador);
+//		pIdentificador.add(etiquetaIdentificador);
+//		pIdentificador.add(areaIdentificador);
 
 		// Se crean los elementos y se añaden
 		etiquetaDni = new JLabel("DNI                 ");
@@ -134,7 +134,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 		pTelefono.add(areaTelefono);
 
 		// Se crean los elementos y se añaden
-		etiquetaPuesto = new JLabel("Puesto                         ");
+		etiquetaPuesto = new JLabel("Puesto             ");
 		pPuesto.add(etiquetaPuesto);
 		// lista desplegable
 		comboPuesto = new JComboBox();
@@ -147,7 +147,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 		pPuesto.add(comboPuesto);
 
 		// Añadir al JDialog los JPanel
-		add(pIdentificador);
+//		add(pIdentificador);
 		add(pDni);
 		add(pNombre);
 		add(pApellidos);
@@ -194,17 +194,16 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 					int insertar = insertarTrabajador(t);
 
 					if (insertar == 1) {
-						JOptionPane.showMessageDialog(null, "Nuevo trabajador insertado correctamente");
+						JOptionPane.showMessageDialog(null, "Nuevo trabajador insertado correctamente", "Alerta", JOptionPane.WARNING_MESSAGE);
 					} else if (insertar == 2){
-						JOptionPane.showMessageDialog(null, "Trabajador ya existente, datos modificados correctamente");
+						JOptionPane.showMessageDialog(null, "Trabajador ya existente, datos modificados correctamente",  "Alerta", JOptionPane.WARNING_MESSAGE);
 					}else {
-						JOptionPane.showMessageDialog(null, "El ID del trabajador que quiere introducir ya existe y no has echo modificaciones",
-								"Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "El ID del trabajador que quiere introducir ya existe y no has echo modificaciones", "Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 
 			} catch (Exception e1) {
-				JOptionPane.showMessageDialog(null, "El ID debe ser un n�mero entero", "Error",
+				JOptionPane.showMessageDialog(null, "El ID debe ser un numero entero", "Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
 

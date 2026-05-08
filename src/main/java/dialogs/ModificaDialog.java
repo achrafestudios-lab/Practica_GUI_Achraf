@@ -1,14 +1,23 @@
 package dialogs;
 
+import dao.AccesoTrabajador;
+import exception.BDException;
+import exception.TrabajadorException;
 import modelo.Empresa;
 import modelo.Trabajador;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import static dao.AccesoTrabajador.actualizarTrabajador;
 
@@ -16,25 +25,14 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
     /**
      * Elementos del JFrame
      */
-    JLabel etiquetaIdentificador;
-    JTextField areaIdentificador;
-    JLabel etiquetaDni;
-    JTextField areaDni;
-    JLabel etiquetaNombre;
-    JTextField areaNombre;
-    JLabel etiquetaApellidos;
-    JTextField areaApellidos;
-    JLabel etiquetaDireccion;
-    JTextField areaDireccion;
-    JLabel etiquetaTelefono;
-    JTextField areaTelefono;
-    JLabel etiquetaPuesto;
     JComboBox comboPuesto;
     JButton aceptar;
     JButton cancelar;
+    JPanel pBotones;
+    JTable tabla;
 
     /**
-     * Variables a las que se pasar� el contenido de los JTextField y del combo box
+     * Variables a las que se pasara el contenido de los JTextField y del combo box
      */
     int id = 0;
     String dni = "";
@@ -44,98 +42,119 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
     String telefono = "";
     String puesto = "";
 
-    JPanel pIdentificador;
-    JPanel pDni;
-    JPanel pNombre;
-    JPanel pApellidos;
-    JPanel pDireccion;
-    JPanel pTelefono;
-    JPanel pPuesto;
-    JPanel pBotones;
-
     Empresa empresa;
+    List<Trabajador> trabajadores = new ArrayList<Trabajador>();
+
 
     public ModificaDialog(Empresa empresa) {
         this.empresa = empresa;
+
+        // Impedimos que se pueda cambiar el tamaño de la ventana ModificaDialog
         setResizable(false);
-        // titulo del dialog
-        setTitle("Modificar Trabajador por DNI");
-        setSize(300, 350);
+
+        // Titulo del dialog
+        setTitle("Modificado Trabajadores");
+
+        // Tamaño
+        setSize(750, 700);
         setLayout(new FlowLayout());
 
+        // colocacion en el centro de la pantalla
         setLocationRelativeTo(null);
 
-        // una fila por JPanel
-        pIdentificador = new JPanel();
-        pDni = new JPanel();
-        pNombre = new JPanel();
-        pApellidos = new JPanel();
-        pDireccion = new JPanel();
-        pTelefono = new JPanel();
-        pPuesto = new JPanel();
-        pBotones = new JPanel();
+        // Crea un JTable, cada fila será un trabajador
+        String[] columnas = {"Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
+        String[][] datos = empresa.listarTrabajadores();
 
-        // Se crean los elementos y se añaden
-        etiquetaDni = new JLabel("DNI                 ");
-        areaDni = new JTextField(15);
-        // Se añaden al JPanel
-        pDni.add(etiquetaDni);
-        pDni.add(areaDni);
+        // Contiene los datos tanto filas como columnas de la tabla
+        DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Bloquear la columna 0 (primera columna)
+                if (column == 0 || column == 1) {
+                    return false;
+                }
+                // El resto de las celdas serán editables
+                return true;
+            }
+        };
 
-        // Se crean los elementos y se añaden
-        etiquetaNombre = new JLabel("Nombre         ");
-        areaNombre = new JTextField(15);
-        // Se añaden al JPanel
-        pNombre.add(etiquetaNombre);
-        pNombre.add(areaNombre);
+        // Creamos un JTable
+        tabla = new JTable(modelo);
 
-        // Se crean los elementos y se a�aden
-        etiquetaApellidos = new JLabel("Apellidos      ");
-        areaApellidos = new JTextField(15);
-        // Se añaden al JPanel
-        pApellidos.add(etiquetaApellidos);
-        pApellidos.add(areaApellidos);
+        // Metodo para ordenar las columas al interatuar
+        tabla.setAutoCreateRowSorter(true);
 
-        // Se crean los elementos y se añaden
-        etiquetaDireccion = new JLabel("Direccion      ");
-        areaDireccion = new JTextField(15);
-        // Se añaden al JPanel
-        pDireccion.add(etiquetaDireccion);
-        pDireccion.add(areaDireccion);
+        // Mete la tabla en un JCrollPane
+        JScrollPane jsp = new JScrollPane(tabla);
+        jsp.setPreferredSize(new Dimension(700, 600));
+        add(jsp);
 
-        // Se crean los elementos y se a�aden
-        etiquetaTelefono = new JLabel("Telefono       ");
-        areaTelefono = new JTextField(15);
-        // Se añaden al JPanel
-        pTelefono.add(etiquetaTelefono);
-        pTelefono.add(areaTelefono);
-
-        // Se crean los elementos y se añaden
-        etiquetaPuesto = new JLabel("Puesto                         ");
-        pPuesto.add(etiquetaPuesto);
         // lista desplegable
         comboPuesto = new JComboBox();
-        comboPuesto.addItem("Elija Puesto");
         comboPuesto.addItem("Programador");
         comboPuesto.addItem("Analista");
         comboPuesto.addItem("Arquitecto");
         comboPuesto.addItem("Jefe de Proyecto");
-        comboPuesto.addItemListener(this);
-        pPuesto.add(comboPuesto);
 
-        // Añadir al JDialog los JPanel
-        add(pIdentificador);
-        add(pDni);
-        add(pNombre);
-        add(pApellidos);
-        add(pDireccion);
-        add(pTelefono);
-        add(pPuesto);
+        // Marcamos la columna 6 Puesto como comboBox
+        TableColumn columnaRol = tabla.getColumnModel().getColumn(6);
+        columnaRol.setCellEditor(new DefaultCellEditor(comboPuesto));
 
+        tabla.getModel().addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent e) {
+
+                // Solo detecta cambios de tipo UPDATE
+                if (e.getType() != TableModelEvent.UPDATE) {
+                    return;
+                }
+
+                // Detectamos la fila y columna modificada
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+
+                // Este if comprueba si has echo algun cambio para continuar, si no hay cambio se detiene
+//                if (tabla.getValueAt(row, column).equals(tabla.getModel().getValueAt(row, column).toString())) {
+//                    return;
+//                }
+
+                // Obtenemos los valores de toda la fila modificada
+                dni = (String) tabla.getValueAt(row, 1);
+                nombre = (String) tabla.getValueAt(row, 2);
+                apellidos = (String) tabla.getValueAt(row, 3);
+                direccion = (String) tabla.getValueAt(row, 4);
+                telefono = (String) tabla.getValueAt(row, 5);
+                puesto = (String) tabla.getValueAt(row, 6);
+
+
+                // Si no hay errores de sintaxsis permite pasar a lo sigiente
+                if (comprobarErrores()) {
+
+                    // Creamos un objeto Trabajador que almacene
+                    Trabajador trabajador = new Trabajador(0, dni, nombre, apellidos, direccion, telefono, puesto);
+                    System.out.println(trabajador);
+
+                    // Lo añadimos a una lista de trabajadores a modificar
+                    trabajadores.add(trabajador);
+                    System.out.println(trabajadores);
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "El dato no cumple con el formato NO se modificara ", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // una JPanel para guardar los botones
+        pBotones = new JPanel();
+
+        // Creamos boton aceptar y añadimos a JPanel
         aceptar = new JButton("Aceptar");
         aceptar.addActionListener(this);
         pBotones.add(aceptar);
 
+        // Creamos boton cancelar y añadimos a JPanel
         cancelar = new JButton("Cancelar");
         cancelar.addActionListener(this);
         pBotones.add(cancelar);
@@ -151,28 +170,30 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == aceptar) {
-            try {
 
-                dni = areaDni.getText();
-                nombre = areaNombre.getText();
-                apellidos = areaApellidos.getText();
-                direccion = areaDireccion.getText();
-                telefono = areaTelefono.getText();
-                if (comprobarErrores()) {
-                    Trabajador t = new Trabajador(0, dni, nombre, apellidos, direccion, telefono, puesto);
-                    if (actualizarTrabajador(t)) {
-                        JOptionPane.showMessageDialog(null, "Datos modificados correctamente");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "El DNI del trabajador que quiere modificar NO existe",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
-            } catch (Exception e1) {
-                JOptionPane.showMessageDialog(null, e1, "Error",
-                        JOptionPane.ERROR_MESSAGE);
+            // Finaliza la edición activa y confirma los cambios para evitar la pérdida del ultimo dato ingresado.
+            if (tabla.isEditing()) {
+                tabla.getCellEditor().stopCellEditing();
             }
 
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea guardar los cambios modificados?", "Guardar",
+                    JOptionPane.YES_NO_OPTION);
+
+            switch (respuesta) {
+                case JOptionPane.YES_OPTION:
+                    try {
+                        AccesoTrabajador.actualizarListaTrabajadoresPorDni(trabajadores);
+                        JOptionPane.showMessageDialog(null, "Cambios guardados con exito ", "", JOptionPane.INFORMATION_MESSAGE);
+
+                    } catch (TrabajadorException | BDException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                case JOptionPane.NO_OPTION:
+                    // Operaciones en caso negativo no hacer nada
+                    break;
+            }
+
+            // Al tocar cancelar se hace un dispose()
         } else if (e.getSource() == cancelar) {
             dispose();
         }
@@ -201,7 +222,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
                     JOptionPane.ERROR_MESSAGE);
             return false;
         } else if (telefono.equals("") || telefono.length() != 9) {
-            JOptionPane.showMessageDialog(null, "El tel�fono debe tener longitud 9", "Error",
+            JOptionPane.showMessageDialog(null, "El telefono debe tener longitud 9", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
         } else if (puesto.equals("")) {

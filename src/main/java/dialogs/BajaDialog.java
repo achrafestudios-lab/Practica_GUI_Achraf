@@ -6,13 +6,10 @@ package dialogs;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import modelo.Empresa;
 
@@ -23,7 +20,7 @@ import static dao.AccesoTrabajador.eliminarTrabajadorId;
  * @author usuario
  *
  */
-public class BajaDialog extends JDialog implements ActionListener {
+public class BajaDialog extends JDialog implements ActionListener, ItemListener {
 
 	JButton aceptar;
 	JButton cancelar;
@@ -36,8 +33,9 @@ public class BajaDialog extends JDialog implements ActionListener {
 	int id = 0;
 	JPanel panel;
 
-	JPanel pIdentificador;
 
+
+	JPanel pIdentificador;
 
 
 	Empresa empresa;
@@ -59,6 +57,8 @@ public class BajaDialog extends JDialog implements ActionListener {
 		panelBotones = new JPanel();
 		add(panel);
 		add(panelBotones);
+
+
 
 		identificador = new JLabel("Identificador");
 		areaIdentificador = new JTextField(15);
@@ -84,7 +84,7 @@ public class BajaDialog extends JDialog implements ActionListener {
 			int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea dar de baja el trabajador?", "Borrar",
 					JOptionPane.YES_NO_OPTION);
 			switch (respuesta) {
-			case JOptionPane.YES_OPTION:
+				case JOptionPane.YES_OPTION:
 				try {
 					id = Integer.parseInt(areaIdentificador.getText());
 
@@ -124,4 +124,8 @@ public class BajaDialog extends JDialog implements ActionListener {
 	}
 
 
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+
+	}
 }
