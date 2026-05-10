@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AccesoTrabajador {
@@ -342,6 +343,50 @@ public class AccesoTrabajador {
         }
 
         return totalActualizados; // Devuelve cuántos trabajadores se actualizaron en total
+    }
+
+    public static List<Trabajador> obtenerTrabajadoresFiltrados(String campo, String valor) throws BDException {
+        List<Trabajador> trabajadoresAux = new ArrayList<>();
+        PreparedStatement ps;
+        Connection conexion = null;
+
+        List<String> camposPermitidos = Arrays.asList("dni", "nombre", "apellidos", "direccion", "telefono", "puesto");
+        if (!camposPermitidos.contains(campo)) {
+            throw new BDException("Campo no válido para filtrar: " + campo);
+        }
+
+        try {
+            conexion = ConfigMySql.abrirConexion();
+            String sentenciaSelect = "SELECT * FROM trabajador WHERE " + campo + " LIKE ?";
+
+            ps = conexion.prepareStatement(sentenciaSelect);
+            ps.setString(1, "%" + valor + "%");
+
+            ResultSet resultados = ps.executeQuery();
+
+            while (resultados.next()) {
+                int id = resultados.getInt("id");
+                String dni = resultados.getString("dni");
+                String nombre = resultados.getString("nombre");
+                String apellidos = resultados.getString("apellidos");
+                String direccion = resultados.getString("direccion");
+                String telefono = resultados.getString("telefono");
+                String puesto = resultados.getString("puesto");
+
+                Trabajador trabajador = new Trabajador(id, dni, nombre, apellidos, direccion, telefono, puesto);
+                trabajadoresAux.add(trabajador);
+            }
+        } catch (SQLException e) {
+            throw new BDException(BDException.ERROR_QUERY + e.getMessage());
+        } catch (BDException e) {
+            throw new BDException(BDException.ERROR_ABRIR_CONEXION + e.getMessage());
+        } finally {
+            if (conexion != null) {
+                ConfigMySql.cerrarConexion(conexion);
+            }
+        }
+
+        return trabajadoresAux;
     }
 
     public static void main(String[] args) {

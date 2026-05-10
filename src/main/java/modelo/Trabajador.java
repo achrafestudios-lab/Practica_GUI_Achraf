@@ -26,9 +26,20 @@ public class Trabajador {
      * @param telefono
      * @param puesto
      */
+
     public Trabajador(int identificador, String dni, String nombre,
                       String apellidos, String direccion, String telefono, String puesto) {
         this.identificador = identificador;
+        this.dni = dni;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.puesto = puesto;
+    }
+
+    public Trabajador( String dni, String nombre,
+                      String apellidos, String direccion, String telefono, String puesto) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellidos = apellidos;

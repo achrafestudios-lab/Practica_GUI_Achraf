@@ -5,6 +5,7 @@ import exception.BDException;
 import exception.TrabajadorException;
 import modelo.Empresa;
 import modelo.Trabajador;
+import validacion.Validacion;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -27,9 +28,17 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
      */
     JComboBox comboPuesto;
     JButton aceptar;
+    JButton buscar;
     JButton cancelar;
+    JPanel pBotonesArriba;
     JPanel pBotones;
     JTable tabla;
+    JTextField busqueda;
+    JComboBox comboFiltro;
+    String[][] datos;
+    DefaultTableModel modelo;
+    String[] columnas;
+
 
     /**
      * Variables a las que se pasara el contenido de los JTextField y del combo box
@@ -44,6 +53,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
 
     Empresa empresa;
     List<Trabajador> trabajadores = new ArrayList<Trabajador>();
+    boolean isReverting;
 
 
     public ModificaDialog(Empresa empresa) {
@@ -62,12 +72,38 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         // colocacion en el centro de la pantalla
         setLocationRelativeTo(null);
 
+        pBotonesArriba = new JPanel();
+
+// lista desplegable para filtrar
+        comboFiltro = new JComboBox();
+        comboFiltro.addItem("DNI");
+        comboFiltro.addItem("Nombre");
+        comboFiltro.addItem("Apellidos");
+        comboFiltro.addItem("Direccion");
+        comboFiltro.addItem("Telefono");
+        comboFiltro.addItem("Puesto");
+        pBotonesArriba.add(comboFiltro);
+
+
+        busqueda = new JTextField(15);
+        // Se añaden al JPanel
+        pBotonesArriba.add(busqueda);
+
+        // Creamos boton aceptar y añadimos a JPanel
+        buscar = new JButton("Buscar");
+        buscar.addActionListener(this);
+        pBotonesArriba.add(buscar);
+
+
+        add(pBotonesArriba);
+
+
         // Crea un JTable, cada fila será un trabajador
-        String[] columnas = {"Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
-        String[][] datos = empresa.listarTrabajadores();
+        columnas = new String[]{"Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
+        datos = empresa.listarTrabajadores();
 
         // Contiene los datos tanto filas como columnas de la tabla
-        DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
+        modelo = new DefaultTableModel(datos, columnas) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 // Bloquear la columna 0 (primera columna)
@@ -85,9 +121,12 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         // Metodo para ordenar las columas al interatuar
         tabla.setAutoCreateRowSorter(true);
 
+        // Ancho de todas las filas
+        tabla.setRowHeight(30);
+
         // Mete la tabla en un JCrollPane
         JScrollPane jsp = new JScrollPane(tabla);
-        jsp.setPreferredSize(new Dimension(700, 600));
+        jsp.setPreferredSize(new Dimension(700, 560));
         add(jsp);
 
         // lista desplegable
@@ -112,13 +151,14 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
                 }
 
                 // Detectamos la fila y columna modificada
-                int row = e.getFirstRow();
-                int column = e.getColumn();
+                int row = tabla.convertRowIndexToModel(e.getFirstRow());
+                int column = tabla.convertColumnIndexToModel(e.getColumn());
 
                 // Este if comprueba si has echo algun cambio para continuar, si no hay cambio se detiene
-//                if (tabla.getValueAt(row, column).equals(tabla.getModel().getValueAt(row, column).toString())) {
-//                    return;
-//                }
+                if (tabla.getValueAt(e.getFirstRow(), e.getColumn()).equals(datos[row][column])) {
+                    isReverting = false;
+                    return;
+                }
 
                 // Obtenemos los valores de toda la fila modificada
                 dni = (String) tabla.getValueAt(row, 1);
@@ -129,11 +169,17 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
                 puesto = (String) tabla.getValueAt(row, 6);
 
 
+                // If que comprueba si hay que rebertir los cambios echos
+                if (isReverting) {
+                    isReverting = false;
+                    return;
+                }
+
                 // Si no hay errores de sintaxsis permite pasar a lo sigiente
                 if (comprobarErrores()) {
 
                     // Creamos un objeto Trabajador que almacene
-                    Trabajador trabajador = new Trabajador(0, dni, nombre, apellidos, direccion, telefono, puesto);
+                    Trabajador trabajador = new Trabajador(dni, nombre, apellidos, direccion, telefono, puesto);
                     System.out.println(trabajador);
 
                     // Lo añadimos a una lista de trabajadores a modificar
@@ -141,7 +187,9 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
                     System.out.println(trabajadores);
 
                 } else {
-                    JOptionPane.showMessageDialog(null, "El dato no cumple con el formato NO se modificara ", "Error", JOptionPane.ERROR_MESSAGE);
+                    isReverting = true;
+                    tabla.setValueAt(datos[row][column], e.getFirstRow(), e.getColumn());
+//                    JOptionPane.showMessageDialog(null, "El dato no cumple...");
                 }
             }
         });
@@ -169,7 +217,60 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == aceptar) {
+        if (e.getSource() == buscar) {
+            // Asignamos el valor del JTextField
+            String texto = busqueda.getText().trim();
+
+            // Almacena el valor del combobox
+            String seleccion = (String) comboFiltro.getSelectedItem();
+
+            // Asigna a una variable el valor del combobox
+            String campoBD = switch (seleccion) {
+                case "DNI" -> "dni";
+                case "Nombre" -> "nombre";
+                case "Apellidos" -> "apellidos";
+                case "Direccion" -> "direccion";
+                case "Telefono" -> "telefono";
+                case "Puesto" -> "puesto";
+                default -> null;
+            };
+
+            // Si es null no hace nada
+            if (campoBD == null) return;
+
+            try {
+                if (texto.isEmpty()) { // Si esta vacio el texto muestra todo
+                    datos = empresa.listarTrabajadores();
+                } else {
+                    // Creamos una lista con los datos filtrados
+                    List<Trabajador> filtrados = AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
+                    datos = new String[filtrados.size()][7];
+                    for (int i = 0; i < filtrados.size(); i++) {
+                        Trabajador t = filtrados.get(i);
+                        datos[i][0] = Integer.toString(t.getIdentificador());
+                        datos[i][1] = t.getDni();
+                        datos[i][2] = t.getNombre();
+                        datos[i][3] = t.getApellidos();
+                        datos[i][4] = t.getDireccion();
+                        datos[i][5] = t.getTelefono();
+                        datos[i][6] = t.getPuesto();
+                    }
+                }
+
+                // ESTO ELIMINA TODAS LAS TABLAS DEL MODELO PARA HACER ESPACIO A EL FILTRO
+                while (modelo.getRowCount() > 0) {
+                    modelo.removeRow(0);
+                }
+
+                // Inserta el giltrado a la tabla
+                for (String[] fila : datos) {
+                    modelo.addRow(fila);
+                }
+
+            } catch (BDException ex) {
+                JOptionPane.showMessageDialog(null, "Error al filtrar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else if (e.getSource() == aceptar) {
 
             // Finaliza la edición activa y confirma los cambios para evitar la pérdida del ultimo dato ingresado.
             if (tabla.isEditing()) {
@@ -206,26 +307,53 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
 
     public boolean comprobarErrores() {
 
-        if (dni.equals("") || dni.length() != 9) {
-            JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (nombre.equals("")) {
+        int resDni = Validacion.verificarDni(dni);
+        switch (resDni) {
+            case 1:
+                JOptionPane.showMessageDialog(null, "El DNI no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            case 2:
+                JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            case 3:
+                JOptionPane.showMessageDialog(null, "El DNI debe contener 8 dígitos y una letra", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            case 4:
+                JOptionPane.showMessageDialog(null, "La letra del DNI no es correcta", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+        }
+
+        if (nombre.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debe introducir el nombre del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
-        } else if (apellidos.equals("")) {
+        } else if (apellidos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debe introducir los apellidos del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
-        } else if (direccion.equals("")) {
+        } else if (direccion.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debe introducir la direcci�n del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
-        } else if (telefono.equals("") || telefono.length() != 9) {
-            JOptionPane.showMessageDialog(null, "El telefono debe tener longitud 9", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (puesto.equals("")) {
+        }
+
+        int resTel = Validacion.validarTelefono(telefono);
+        switch (resTel) {
+            case 1:
+                JOptionPane.showMessageDialog(null, "El teléfono no puede ser nulo", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            case 2:
+                JOptionPane.showMessageDialog(null, "El teléfono no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            case 3:
+                JOptionPane.showMessageDialog(null, "El teléfono debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            case 4:
+                JOptionPane.showMessageDialog(null, "El teléfono solo debe contener dígitos", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+        }
+
+        if (puesto.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debe introducir el puesto del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
