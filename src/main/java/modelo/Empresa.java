@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package modelo;
 
@@ -13,127 +13,145 @@ import static dao.AccesoTrabajador.obtenerTrabajadoresBaseDatos;
  *
  */
 public class Empresa {
-	
-	List <Trabajador> trabajadores;
-	
 
-	/**
-	 * @param trabajadores
-	 */
-	public Empresa(List<Trabajador> trabajadores) {
-		this.trabajadores = trabajadores;
-	}
-	
-	/**
-	 * Comprueba si un trabajador est� en la lista
-	 * @param t
-	 * @return
-	 */
-	public boolean esta(Trabajador t){
-		for(int i=0; i<trabajadores.size(); i++){
-			if(trabajadores.get(i).getIdentificador() == t.getIdentificador()){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Devuelve la posici�n en la que se encuentra un trabajador
-	 * busc�ndolo por dni
-	 * @param codigo
-	 * @return
-	 */
-	public int devolverPosicion(int codigo){
-		for(int i=0; i<trabajadores.size(); i++){
-			if (trabajadores.get(i).getIdentificador() == codigo){
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	/**
-	 * Si el trabajador no est� en la lista, lo a�ade
-	 * @param t
-	 */
-	public boolean altaTrabajador(Trabajador t){
-		if(!esta(t)){
-			trabajadores.add(t);
-			return true;
-		}
-		else return false;
-	}
-	/**
-	 * Da de baja un trabajador busc�ndolo por c�digo
-	 * @param codigo
-	 */
-	public boolean bajaTrabajador(int codigo){
-		int posicion = devolverPosicion(codigo);
-		if(posicion > -1){
-			trabajadores.remove(posicion);
-			return true;
-		}
-		else return false;
-	}
-	/**
-	 * Devuelve un trabajador
-	 * @param codigo
-	 * @return
-	 */
-	public Trabajador buscarTrabajador(int codigo){		
-		for(int i=0; i<trabajadores.size(); i++){
-			if(trabajadores.get(i).getIdentificador() == codigo){
-				return( trabajadores.get(i)); 
-			}
-		}
-		return null;
-	}
-	/**
-	 * Permite modificar el valor de los atributos de un objeto Trabajador
-	 * @param dni
-	 * @return
-	 */
-	public void modificarTrabajador(int codigo, String dni, String nombre, String apellidos, String direccion, String telefono, String puesto){
-		int posicion = devolverPosicion(codigo);
-		trabajadores.get(posicion).setDni(dni);
-		trabajadores.get(posicion).setNombre(nombre);
-		trabajadores.get(posicion).setApellidos(apellidos);
-		trabajadores.get(posicion).setDireccion(direccion);
-		trabajadores.get(posicion).setTelefono(telefono);
-		trabajadores.get(posicion).setPuesto(puesto);
-	}
-	
-	/**
-	 * Devuelve una matriz que se utilizar� para listar los trabajadores
-	 * @return Da una matriz con los trabajadores por filas
-	 */
-	public String[][] listarTrabajadores(){
+    List<Trabajador> trabajadores;
 
-		setTrabajadores(obtenerTrabajadoresBaseDatos());
 
-		String [][] datos = new String[trabajadores.size()][7];
-		for (int i=0; i<trabajadores.size(); i++){
-			String[] fila = new String [7];
-			
-			fila[0] = Integer.toString(trabajadores.get(i).getIdentificador());
-			fila[1] = trabajadores.get(i).getDni();
-			fila[2] = trabajadores.get(i).getNombre();
-			fila[3] = trabajadores.get(i).getApellidos();
-			fila[4] = trabajadores.get(i).getDireccion();
-			fila[5] = trabajadores.get(i).getTelefono();
-			fila[6] = trabajadores.get(i).getPuesto();
-			
-			datos[i] = fila;
-		}
-		return datos;
-	}
+    /**
+     * @param trabajadores
+     */
+    public Empresa(List<Trabajador> trabajadores) {
+        this.trabajadores = trabajadores;
+    }
 
-	public List<Trabajador> getTrabajadores() {
-		return trabajadores;
-	}
+    /**
+     * Comprueba si un trabajador est� en la lista
+     * @param t
+     * @return
+     */
+    public boolean esta(Trabajador t) {
+        for (int i = 0; i < trabajadores.size(); i++) {
+            if (trabajadores.get(i).getIdentificador() == t.getIdentificador()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public void setTrabajadores(List<Trabajador> trabajadores) {
-		this.trabajadores = trabajadores;
-	}
+    /**
+     * Devuelve la posici�n en la que se encuentra un trabajador
+     * busc�ndolo por dni
+     * @param codigo
+     * @return
+     */
+    public int devolverPosicion(int codigo) {
+        for (int i = 0; i < trabajadores.size(); i++) {
+            if (trabajadores.get(i).getIdentificador() == codigo) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Si el trabajador no est� en la lista, lo a�ade
+     * @param t
+     */
+    public boolean altaTrabajador(Trabajador t) {
+        if (!esta(t)) {
+            trabajadores.add(t);
+            return true;
+        } else return false;
+    }
+
+    /**
+     * Da de baja un trabajador busc�ndolo por c�digo
+     * @param codigo
+     */
+    public boolean bajaTrabajador(int codigo) {
+        int posicion = devolverPosicion(codigo);
+        if (posicion > -1) {
+            trabajadores.remove(posicion);
+            return true;
+        } else return false;
+    }
+
+    /**
+     * Devuelve un trabajador
+     * @param codigo
+     * @return
+     */
+    public Trabajador buscarTrabajador(int codigo) {
+        for (int i = 0; i < trabajadores.size(); i++) {
+            if (trabajadores.get(i).getIdentificador() == codigo) {
+                return (trabajadores.get(i));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Permite modificar el valor de los atributos de un objeto Trabajador
+     * @param dni
+     * @return
+     */
+    public void modificarTrabajador(int codigo, String dni, String nombre, String apellidos, String direccion, String telefono, String puesto) {
+        int posicion = devolverPosicion(codigo);
+        trabajadores.get(posicion).setDni(dni);
+        trabajadores.get(posicion).setNombre(nombre);
+        trabajadores.get(posicion).setApellidos(apellidos);
+        trabajadores.get(posicion).setDireccion(direccion);
+        trabajadores.get(posicion).setTelefono(telefono);
+        trabajadores.get(posicion).setPuesto(puesto);
+    }
+
+    /**
+     * Devuelve una matriz que se utilizar� para listar los trabajadores
+     * @return Da una matriz con los trabajadores por filas
+     */
+    public String[][] listarTrabajadores() {
+
+        setTrabajadores(obtenerTrabajadoresBaseDatos());
+
+        String[][] datos = new String[trabajadores.size()][7];
+        for (int i = 0; i < trabajadores.size(); i++) {
+            String[] fila = new String[7];
+
+            fila[0] = Integer.toString(trabajadores.get(i).getIdentificador());
+            fila[1] = trabajadores.get(i).getDni();
+            fila[2] = trabajadores.get(i).getNombre();
+            fila[3] = trabajadores.get(i).getApellidos();
+            fila[4] = trabajadores.get(i).getDireccion();
+            fila[5] = trabajadores.get(i).getTelefono();
+            fila[6] = trabajadores.get(i).getPuesto();
+
+            datos[i] = fila;
+        }
+        return datos;
+    }
+
+    public Object[][] listarTrabajadoresCheckBox() {
+        Object[][] datos = new Object[trabajadores.size()][8];
+        for (int i = 0; i < trabajadores.size(); i++) {
+            Object[] fila = new Object[8];
+            fila[0] = Integer.toString(trabajadores.get(i).getIdentificador());
+            fila[1] = trabajadores.get(i).getDni();
+            fila[2] = trabajadores.get(i).getNombre();
+            fila[3] = trabajadores.get(i).getApellidos();
+            fila[4] = trabajadores.get(i).getDireccion();
+            fila[5] = trabajadores.get(i).getTelefono();
+            fila[6] = trabajadores.get(i).getPuesto();
+            fila[7] = Boolean.FALSE;  // checkbox desmarcado por defecto
+            datos[i] = fila;
+        }
+        return datos;
+    }
+
+    public List<Trabajador> getTrabajadores() {
+        return trabajadores;
+    }
+
+    public void setTrabajadores(List<Trabajador> trabajadores) {
+        this.trabajadores = trabajadores;
+    }
 }

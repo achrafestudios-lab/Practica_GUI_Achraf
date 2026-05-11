@@ -3,6 +3,8 @@
  */
 package modelo;
 
+import java.util.Objects;
+
 /**
  * @author alumno
  *
@@ -38,7 +40,7 @@ public class Trabajador {
         this.puesto = puesto;
     }
 
-    public Trabajador( String dni, String nombre,
+    public Trabajador(String dni, String nombre,
                       String apellidos, String direccion, String telefono, String puesto) {
         this.dni = dni;
         this.nombre = nombre;
@@ -61,6 +63,10 @@ public class Trabajador {
     }
 
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(dni);
+    }
 
     /**
      * @return the identificador

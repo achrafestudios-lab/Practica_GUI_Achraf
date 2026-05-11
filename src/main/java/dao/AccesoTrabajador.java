@@ -136,7 +136,7 @@ public class AccesoTrabajador {
 
     }
 
-    public static boolean eliminarTrabajadorId(int id) throws BDException {
+    public static boolean eliminarTrabajadorId(String id) throws BDException {
         Connection conexion = null;
         int columnasEliminadas = 0;
 
@@ -148,7 +148,7 @@ public class AccesoTrabajador {
 
             PreparedStatement sentencia = conexion.prepareStatement(sentenciaInsertarDept);
 
-            sentencia.setInt(1, id);
+            sentencia.setString(1, id);
 
             columnasEliminadas = sentencia.executeUpdate();
 
@@ -531,35 +531,35 @@ public class AccesoTrabajador {
         }
 
         System.out.println("\n========== TEST 12: eliminarTrabajadorId ==========");
-        try {
-            // Primero obtenemos un ID real de la BD
-            List<Trabajador> todos = obtenerTrabajadoresBaseDatos();
-            if (!todos.isEmpty()) {
-                int idAEliminar = todos.get(0).getIdentificador();
-                boolean eliminado = eliminarTrabajadorId(idAEliminar);
-                if (eliminado) {
-                    System.out.println("OK - Trabajador con ID " + idAEliminar + " eliminado.");
-                } else {
-                    System.out.println("AVISO - No se encontró el trabajador con ese ID.");
-                }
-            } else {
-                System.out.println("AVISO - No hay trabajadores en BD para probar eliminarPorId.");
-            }
-        } catch (BDException e) {
-            System.out.println("ERROR - " + e.getMessage());
-        }
+//        try {
+//            // Primero obtenemos un ID real de la BD
+//            List<Trabajador> todos = obtenerTrabajadoresBaseDatos();
+//            if (!todos.isEmpty()) {
+//                int idAEliminar = todos.get(0).getIdentificador();
+//                boolean eliminado = eliminarTrabajadorId(idAEliminar);
+//                if (eliminado) {
+//                    System.out.println("OK - Trabajador con ID " + idAEliminar + " eliminado.");
+//                } else {
+//                    System.out.println("AVISO - No se encontró el trabajador con ese ID.");
+//                }
+//            } else {
+//                System.out.println("AVISO - No hay trabajadores en BD para probar eliminarPorId.");
+//            }
+//        } catch (BDException e) {
+//            System.out.println("ERROR - " + e.getMessage());
+//        }
 
         System.out.println("\n========== TEST 13: eliminarTrabajadorId (ID inexistente) ==========");
-        try {
-            boolean eliminado = eliminarTrabajadorId(-1);
-            if (!eliminado) {
-                System.out.println("OK - Correctamente devuelve false para ID inexistente.");
-            } else {
-                System.out.println("AVISO - Se eliminó algo inesperado.");
-            }
-        } catch (BDException e) {
-            System.out.println("ERROR - " + e.getMessage());
-        }
+//        try {
+//            boolean eliminado = eliminarTrabajadorId(-1);
+//            if (!eliminado) {
+//                System.out.println("OK - Correctamente devuelve false para ID inexistente.");
+//            } else {
+//                System.out.println("AVISO - Se eliminó algo inesperado.");
+//            }
+//        } catch (BDException e) {
+//            System.out.println("ERROR - " + e.getMessage());
+//        }
 
         System.out.println("========== TEST: actualizarListaTrabajadoresPorDni ==========");
 

@@ -63,12 +63,8 @@ public class ListarDialog extends JDialog implements ActionListener {
         DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Bloquear la columna 0 (primera columna)
-                if (column >= 0 && column <= 6) {
-                    return false;
-                }
-                // El resto de las celdas serán editables
-                return true;
+
+                return false;
             }
         };
         tabla = new JTable(modelo);
@@ -125,6 +121,7 @@ public class ListarDialog extends JDialog implements ActionListener {
     }
 
     public boolean comprobarErrores() {
+        
         if (dni.equals("") || dni.length() != 9) {
             JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
             return false;

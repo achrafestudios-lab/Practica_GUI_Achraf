@@ -20,7 +20,6 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dao.AccesoTrabajador.actualizarTrabajador;
 
 public class ModificaDialog extends JDialog implements ActionListener, ItemListener {
     /**
@@ -89,7 +88,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         // Se añaden al JPanel
         pBotonesArriba.add(busqueda);
 
-        // Creamos boton aceptar y añadimos a JPanel
+        // Creamos boton eliminar y añadimos a JPanel
         buscar = new JButton("Buscar");
         buscar.addActionListener(this);
         pBotonesArriba.add(buscar);
@@ -197,7 +196,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         // una JPanel para guardar los botones
         pBotones = new JPanel();
 
-        // Creamos boton aceptar y añadimos a JPanel
+        // Creamos boton eliminar y añadimos a JPanel
         aceptar = new JButton("Aceptar");
         aceptar.addActionListener(this);
         pBotones.add(aceptar);
@@ -225,15 +224,30 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
             String seleccion = (String) comboFiltro.getSelectedItem();
 
             // Asigna a una variable el valor del combobox
-            String campoBD = switch (seleccion) {
-                case "DNI" -> "dni";
-                case "Nombre" -> "nombre";
-                case "Apellidos" -> "apellidos";
-                case "Direccion" -> "direccion";
-                case "Telefono" -> "telefono";
-                case "Puesto" -> "puesto";
-                default -> null;
-            };
+            String campoBD;
+            switch (seleccion) {
+                case "DNI":
+                    campoBD = "dni";
+                    break;
+                case "Nombre":
+                    campoBD = "nombre";
+                    break;
+                case "Apellidos":
+                    campoBD = "apellidos";
+                    break;
+                case "Direccion":
+                    campoBD = "direccion";
+                    break;
+                case "Telefono":
+                    campoBD = "telefono";
+                    break;
+                case "Puesto":
+                    campoBD = "puesto";
+                    break;
+                default:
+                    campoBD = null;
+                    break;
+            }
 
             // Si es null no hace nada
             if (campoBD == null) return;
@@ -246,21 +260,16 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
                     List<Trabajador> filtrados = AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
                     datos = new String[filtrados.size()][7];
                     for (int i = 0; i < filtrados.size(); i++) {
-                        Trabajador t = filtrados.get(i);
-                        datos[i][0] = Integer.toString(t.getIdentificador());
-                        datos[i][1] = t.getDni();
-                        datos[i][2] = t.getNombre();
-                        datos[i][3] = t.getApellidos();
-                        datos[i][4] = t.getDireccion();
-                        datos[i][5] = t.getTelefono();
-                        datos[i][6] = t.getPuesto();
+                        BajaDialog.creaFilasFiltradasTrabajadores(filtrados, i, datos);
                     }
                 }
 
                 // ESTO ELIMINA TODAS LAS TABLAS DEL MODELO PARA HACER ESPACIO A EL FILTRO
-                while (modelo.getRowCount() > 0) {
-                    modelo.removeRow(0);
-                }
+                modelo.setRowCount(0);
+
+                JOptionPane.showMessageDialog(this,
+                        "Resultados encontrados: " + datos.length,
+                        "Busqueda", JOptionPane.INFORMATION_MESSAGE);
 
                 // Inserta el giltrado a la tabla
                 for (String[] fila : datos) {

@@ -3,7 +3,7 @@
  */
 package dialogs;
 
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -32,11 +32,6 @@ import static validacion.Validacion.verificarDni;
  */
 public class AltaDialog extends JDialog implements ActionListener, ItemListener {
 
-    /**
-     * Elementos del JFrame
-     */
-//	JLabel etiquetaIdentificador;
-//	JTextField areaIdentificador;
     JLabel etiquetaDni;
     JTextField areaDni;
     JLabel etiquetaNombre;
@@ -53,7 +48,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
     JButton cancelar;
 
     /**
-     * Variables a las que se pasar� el contenido de los JTextField y del combo box
+     * Variables a las que se pasara el contenido de los JTextField y del combo box
      */
 //	int id = 0;
     String dni = "";
@@ -226,31 +221,44 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
      */
     public boolean comprobarErrores() {
 
+        areaDni.setBackground(Color.WHITE);
+        areaNombre.setBackground(Color.WHITE);
+        areaApellidos.setBackground(Color.WHITE);
+        areaDireccion.setBackground(Color.WHITE);
+        areaTelefono.setBackground(Color.WHITE);
+
         int resDni = Validacion.verificarDni(dni);
         switch (resDni) {
             case 1:
+                areaDni.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El DNI no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             case 2:
+                areaDni.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             case 3:
+                areaDni.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El DNI debe contener 8 dígitos y una letra", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             case 4:
+                areaDni.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "La letra del DNI no es correcta", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
         }
 
         if (nombre.isEmpty()) {
+            areaNombre.setBackground(Color.RED);
             JOptionPane.showMessageDialog(null, "Debe introducir el nombre del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
         } else if (apellidos.isEmpty()) {
+            areaApellidos.setBackground(Color.RED);
             JOptionPane.showMessageDialog(null, "Debe introducir los apellidos del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
         } else if (direccion.isEmpty()) {
+            areaDireccion.setBackground(Color.RED);
             JOptionPane.showMessageDialog(null, "Debe introducir la direcci�n del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;
@@ -259,15 +267,19 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
         int resTel = Validacion.validarTelefono(telefono);
         switch (resTel) {
             case 1:
+                areaTelefono.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El teléfono no puede ser nulo", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             case 2:
+                areaTelefono.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El teléfono no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             case 3:
+                areaTelefono.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El teléfono debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             case 4:
+                areaTelefono.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(null, "El teléfono solo debe contener dígitos", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
         }

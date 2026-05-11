@@ -156,21 +156,16 @@ public class VerDialog extends JDialog implements ActionListener, ItemListener {
                     List<Trabajador> filtrados = AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
                     datos = new String[filtrados.size()][7];
                     for (int i = 0; i < filtrados.size(); i++) {
-                        Trabajador t = filtrados.get(i);
-                        datos[i][0] = Integer.toString(t.getIdentificador());
-                        datos[i][1] = t.getDni();
-                        datos[i][2] = t.getNombre();
-                        datos[i][3] = t.getApellidos();
-                        datos[i][4] = t.getDireccion();
-                        datos[i][5] = t.getTelefono();
-                        datos[i][6] = t.getPuesto();
+                        BajaDialog.creaFilasFiltradasTrabajadores(filtrados, i, datos);
                     }
                 }
 
                 // ESTO ELIMINA TODAS LAS TABLAS DEL MODELO PARA HACER ESPACIO A EL FILTRO
-                while (modelo.getRowCount() > 0) {
-                    modelo.removeRow(0);
-                }
+                modelo.setRowCount(0);
+
+                JOptionPane.showMessageDialog(this,
+                        "Resultados encontrados: " + datos.length,
+                        "Busqueda", JOptionPane.INFORMATION_MESSAGE);
 
                 // Inserta el giltrado a la tabla
                 for (String[] fila : datos) {
