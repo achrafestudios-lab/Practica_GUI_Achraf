@@ -285,6 +285,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
         }
 
         if (puesto.isEmpty()) {
+            comboPuesto.setBackground(Color.RED);
             JOptionPane.showMessageDialog(null, "Debe introducir el puesto del trabajador", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return false;

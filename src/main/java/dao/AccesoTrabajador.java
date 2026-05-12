@@ -136,7 +136,7 @@ public class AccesoTrabajador {
 
     }
 
-    public static boolean eliminarTrabajadorId(String id) throws BDException {
+    public static boolean eliminarTrabajadorId(List<String> idTrabajadores) throws BDException {
         Connection conexion = null;
         int columnasEliminadas = 0;
 
@@ -144,13 +144,22 @@ public class AccesoTrabajador {
         try {
             conexion = ConfigMySql.abrirConexion();
 
+            conexion.setAutoCommit(false);
+
             String sentenciaInsertarDept = "DELETE FROM trabajador WHERE id = ?";
 
             PreparedStatement sentencia = conexion.prepareStatement(sentenciaInsertarDept);
 
-            sentencia.setString(1, id);
+            for (String idTrabajador : idTrabajadores) {
+                sentencia.setString(1, idTrabajador);
+                sentencia.addBatch();
+            }
 
-            columnasEliminadas = sentencia.executeUpdate();
+            int[] filasEliminadas = sentencia.executeBatch();
+
+            conexion.commit();
+
+            columnasEliminadas = filasEliminadas.length;
 
 
         } catch (SQLException e) {

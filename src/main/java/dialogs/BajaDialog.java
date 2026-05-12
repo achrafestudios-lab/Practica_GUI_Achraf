@@ -293,9 +293,8 @@ public class BajaDialog extends JDialog implements ActionListener {
                 case JOptionPane.YES_OPTION:
                     try {
                         // Recorre la lista de IDs a eliminar y los borra de la base de datos
-                        for (String idTrabajador : trabajadoresAEliminar) {
-                            AccesoTrabajador.eliminarTrabajadorId(idTrabajador);
-                        }
+                        AccesoTrabajador.eliminarTrabajadorId(trabajadoresAEliminar);
+
                         // Actualiza la lista interna de la empresa para reflejar los cambios
                         empresa.setTrabajadores(AccesoTrabajador.obtenerTrabajadoresBaseDatos());
                         // Muestra mensaje de éxito
