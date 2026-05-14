@@ -26,6 +26,7 @@ public class Empresa {
 
     /**
      * Comprueba si un trabajador est� en la lista
+     *
      * @param t
      * @return
      */
@@ -41,6 +42,7 @@ public class Empresa {
     /**
      * Devuelve la posici�n en la que se encuentra un trabajador
      * busc�ndolo por dni
+     *
      * @param codigo
      * @return
      */
@@ -55,6 +57,7 @@ public class Empresa {
 
     /**
      * Si el trabajador no est� en la lista, lo a�ade
+     *
      * @param t
      */
     public boolean altaTrabajador(Trabajador t) {
@@ -66,6 +69,7 @@ public class Empresa {
 
     /**
      * Da de baja un trabajador busc�ndolo por c�digo
+     *
      * @param codigo
      */
     public boolean bajaTrabajador(int codigo) {
@@ -78,6 +82,7 @@ public class Empresa {
 
     /**
      * Devuelve un trabajador
+     *
      * @param codigo
      * @return
      */
@@ -92,6 +97,7 @@ public class Empresa {
 
     /**
      * Permite modificar el valor de los atributos de un objeto Trabajador
+     *
      * @param dni
      * @return
      */
@@ -107,6 +113,7 @@ public class Empresa {
 
     /**
      * Devuelve una matriz que se utilizar� para listar los trabajadores
+     *
      * @return Da una matriz con los trabajadores por filas
      */
     public String[][] listarTrabajadores() {

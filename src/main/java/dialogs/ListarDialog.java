@@ -5,24 +5,25 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
-import dao.AccesoTrabajador;
-import exception.BDException;
-import exception.TrabajadorException;
+import ficheros.FicheroDatos;
+import ficheros.FicheroJSON;
+import ficheros.FiecheroCSV;
 import modelo.Empresa;
 import modelo.Trabajador;
+import utilidades.Utilidades;
 
 /**
+ * Diálogo para listar todos los trabajadores en una tabla de solo lectura.
+ * Permite visualizar los datos de los trabajadores y cerrar la ventana.
  *
- * @author usuario
- *
+ * @author ach.dev
  */
 public class ListarDialog extends JDialog implements ActionListener {
 
@@ -32,6 +33,8 @@ public class ListarDialog extends JDialog implements ActionListener {
     JTable tabla;
     JButton cerrar;
     JButton aceptar;
+    JButton exportar;
+    JPanel contentPane;
 
     List<Trabajador> trabajadores = new ArrayList<Trabajador>();
 
@@ -56,7 +59,7 @@ public class ListarDialog extends JDialog implements ActionListener {
         setLocationRelativeTo(null);
 
         // Crea un JTable, cada fila será un trabajador
-        String[] columnas = {"Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
+        String[] columnas = {"ID", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
         String[][] datos = empresa.listarTrabajadores();
 
         // Contiene los datos tanto filas como columnas de la tabla
@@ -80,9 +83,20 @@ public class ListarDialog extends JDialog implements ActionListener {
         jsp.setPreferredSize(new Dimension(700, 600));
         add(jsp);
 
+        contentPane = new JPanel();
+
+        exportar = new JButton("Exportar");
+        exportar.addActionListener(this);
+        contentPane.add(exportar);
+
         cerrar = new JButton("Cerrar");
         cerrar.addActionListener(this);
-        add(cerrar);
+        contentPane.add(cerrar);
+
+        add(contentPane);
+
+
+        Utilidades.ajustarAnchoColumnas(tabla);
 
         setVisible(true);
     }
@@ -90,63 +104,46 @@ public class ListarDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == aceptar) {
-            if (tabla.isEditing()) {
-                tabla.getCellEditor().stopCellEditing();
+        if (source == exportar) {
+            String[] opciones = {"Exportación CSV", "Exportación JSON", "Cancelar"};
+            int resp = JOptionPane.showOptionDialog(
+                    this, "¿A que formato quieres exportar?", "Exportar",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, opciones, opciones[2]);
+            if (resp == 0) {
+                System.out.println(opciones[0]);
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setSelectedFile(new java.io.File("trabajadores.csv"));
+                fileChooser.setFileFilter(new FileNameExtensionFilter("CSV", "csv"));
+                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    FiecheroCSV.exportarFicheroCSV(fileChooser.getSelectedFile().getAbsolutePath(), empresa.getTrabajadores());
+                }
+                JOptionPane.showMessageDialog(this,
+                        "Se han exportado: " + empresa.getTrabajadores().size() + " trabajadores",
+                        "Completado", JOptionPane.INFORMATION_MESSAGE);
+
+            } else if (resp == 1) {
+                System.out.println(opciones[1]);
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setSelectedFile(new java.io.File("trabajadores.json"));
+                fileChooser.setFileFilter(new FileNameExtensionFilter("JSON", "json"));
+                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    FicheroJSON.exportarFicheroJSON(fileChooser.getSelectedFile().getAbsolutePath(), empresa.getTrabajadores());
+                }
+                JOptionPane.showMessageDialog(this,
+                        "Se han exportado: " + empresa.getTrabajadores().size() + " trabajadores",
+                        "Completado", JOptionPane.INFORMATION_MESSAGE);
+
+            } else if (resp == 2) {
+                System.out.println(opciones[2]);
             }
 
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea guardar los cambios trabajador?", "Guardar",
-                    JOptionPane.YES_NO_OPTION);
-            switch (respuesta) {
-                case JOptionPane.YES_OPTION:
-                    try {
-                        AccesoTrabajador.insertarListaTrabajadores(trabajadores);
-                        JOptionPane.showMessageDialog(null, "Cambios guardados con exito", "", JOptionPane.INFORMATION_MESSAGE);
-
-                    } catch (TrabajadorException | BDException ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                case JOptionPane.NO_OPTION:
-                    // Operaciones en caso negativo
-                    break;
-            }
-
-            System.out.println("Aceptar");
         } else if (source == cerrar) {
             dispose();
             System.out.println("Cerrar");
         } else {
             System.out.println("Default");
         }
-    }
-
-    public boolean comprobarErrores() {
-        
-        if (dni.equals("") || dni.length() != 9) {
-            JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (nombre.equals("")) {
-            JOptionPane.showMessageDialog(null, "Debe introducir el nombre del trabajador", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (apellidos.equals("")) {
-            JOptionPane.showMessageDialog(null, "Debe introducir los apellidos del trabajador", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (direccion.equals("")) {
-            JOptionPane.showMessageDialog(null, "Debe introducir la direcci�n del trabajador", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (telefono.equals("") || telefono.length() != 9) {
-            JOptionPane.showMessageDialog(null, "El tel�fono debe tener longitud 9", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        } else if (puesto.equals("")) {
-            JOptionPane.showMessageDialog(null, "Debe introducir el puesto del trabajador", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- *
+ * Paquete que contiene los diálogos de la interfaz gráfica.
  */
 package dialogs;
 
@@ -8,44 +8,53 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import dao.AccesoTrabajador;
+import exception.TrabajadorException;
+import ficheros.FiecheroCSV;
 import modelo.Empresa;
 import modelo.Trabajador;
 import validacion.Validacion;
 
 import static dao.AccesoTrabajador.insertarTrabajador;
-import static validacion.Validacion.validarTelefono;
-import static validacion.Validacion.verificarDni;
 
 /**
+ * Diálogo para dar de alta un nuevo trabajador.
+ * Proporciona un formulario con campos para DNI, nombre, apellidos,
+ * dirección, teléfono y puesto, con validación de datos.
  *
- * @author usuario
- *
+ * @author ach.dev
  */
 public class AltaDialog extends JDialog implements ActionListener, ItemListener {
 
     JLabel etiquetaDni;
     JTextField areaDni;
+
     JLabel etiquetaNombre;
     JTextField areaNombre;
+
     JLabel etiquetaApellidos;
     JTextField areaApellidos;
+
     JLabel etiquetaDireccion;
     JTextField areaDireccion;
+
     JLabel etiquetaTelefono;
     JTextField areaTelefono;
+
     JLabel etiquetaPuesto;
+
     JComboBox comboPuesto;
+
     JButton aceptar;
     JButton cancelar;
+    JButton importar;
+
 
     /**
      * Variables a las que se pasara el contenido de los JTextField y del combo box
@@ -66,6 +75,8 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
     JPanel pTelefono;
     JPanel pPuesto;
     JPanel pBotones;
+    JPanel botoneImportar;
+
 
     Empresa empresa;
 
@@ -88,6 +99,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
         pTelefono = new JPanel();
         pPuesto = new JPanel();
         pBotones = new JPanel();
+        botoneImportar = new JPanel();
 
         // Se crean los elementos y se añaden
 //		etiquetaIdentificador = new JLabel("Identificador");
@@ -162,7 +174,16 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
         cancelar.addActionListener(this);
         pBotones.add(cancelar);
 
-        add(pBotones);
+
+        importar = new JButton("Importar");
+        importar.addActionListener(this);
+        botoneImportar.add(importar);
+
+        JPanel pContenedorBotones = new JPanel();
+        pContenedorBotones.setLayout(new BoxLayout(pContenedorBotones, BoxLayout.Y_AXIS));
+        pContenedorBotones.add(pBotones);
+        pContenedorBotones.add(botoneImportar);
+        add(pContenedorBotones);
 
         // Visible
         setVisible(true);
@@ -207,6 +228,24 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
                         JOptionPane.ERROR_MESSAGE);
             }
 
+        } else if (e.getSource() == importar) {
+            List<Trabajador> importados = null;
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("CSV", "csv"));
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                importados = FiecheroCSV.importarFicheroTrabajadores(
+                        fileChooser.getSelectedFile().getAbsolutePath());
+
+                try {
+                    AccesoTrabajador.insertarListaTrabajadores(importados);
+                } catch (TrabajadorException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Se han importado: " + importados.size() + " trabajadores",
+                    "Completado", JOptionPane.INFORMATION_MESSAGE);
         } else if (e.getSource() == cancelar) {
             dispose();
         }

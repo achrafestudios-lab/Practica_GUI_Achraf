@@ -5,6 +5,7 @@ import exception.BDException;
 import exception.TrabajadorException;
 import modelo.Empresa;
 import modelo.Trabajador;
+import utilidades.Utilidades;
 import validacion.Validacion;
 
 import javax.swing.*;
@@ -20,7 +21,13 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Diálogo para modificar los datos de trabajadores existentes.
+ * Muestra una tabla editable donde se pueden cambiar nombre, apellidos,
+ * dirección, teléfono y puesto, con validación de datos y filtro de búsqueda.
+ *
+ * @author ach.dev
+ */
 public class ModificaDialog extends JDialog implements ActionListener, ItemListener {
     /**
      * Elementos del JFrame
@@ -42,7 +49,6 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
     /**
      * Variables a las que se pasara el contenido de los JTextField y del combo box
      */
-    int id = 0;
     String dni = "";
     String nombre = "";
     String apellidos = "";
@@ -51,7 +57,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
     String puesto = "";
 
     Empresa empresa;
-    List<Trabajador> trabajadores = new ArrayList<Trabajador>();
+    List<Trabajador> trabajadores = new ArrayList<>();
     boolean isReverting;
 
 
@@ -68,7 +74,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         setSize(750, 700);
         setLayout(new FlowLayout());
 
-        // colocacion en el centro de la pantalla
+        // colocación en el centro de la pantalla
         setLocationRelativeTo(null);
 
         pBotonesArriba = new JPanel();
@@ -78,8 +84,8 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         comboFiltro.addItem("DNI");
         comboFiltro.addItem("Nombre");
         comboFiltro.addItem("Apellidos");
-        comboFiltro.addItem("Direccion");
-        comboFiltro.addItem("Telefono");
+        comboFiltro.addItem("Dirección");
+        comboFiltro.addItem("Teléfono");
         comboFiltro.addItem("Puesto");
         pBotonesArriba.add(comboFiltro);
 
@@ -88,7 +94,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         // Se añaden al JPanel
         pBotonesArriba.add(busqueda);
 
-        // Creamos boton eliminar y añadimos a JPanel
+        // Creamos botón eliminar y añadimos a JPanel
         buscar = new JButton("Buscar");
         buscar.addActionListener(this);
         pBotonesArriba.add(buscar);
@@ -98,7 +104,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
 
 
         // Crea un JTable, cada fila será un trabajador
-        columnas = new String[]{"Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
+        columnas = new String[]{"ID", "DNI", "Nombre", "Apellidos", "Dirección", "Teléfono", "Puesto"};
         datos = empresa.listarTrabajadores();
 
         // Contiene los datos tanto filas como columnas de la tabla
@@ -106,18 +112,15 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
             @Override
             public boolean isCellEditable(int row, int column) {
                 // Bloquear la columna 0 (primera columna)
-                if (column == 0 || column == 1) {
-                    return false;
-                }
+                return column != 0 && column != 1;
                 // El resto de las celdas serán editables
-                return true;
             }
         };
 
         // Creamos un JTable
         tabla = new JTable(modelo);
 
-        // Metodo para ordenar las columas al interatuar
+        // Método para ordenar las columns al integrate
         tabla.setAutoCreateRowSorter(true);
 
         // Ancho de todas las filas
@@ -153,7 +156,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
                 int row = tabla.convertRowIndexToModel(e.getFirstRow());
                 int column = tabla.convertColumnIndexToModel(e.getColumn());
 
-                // Este if comprueba si has echo algun cambio para continuar, si no hay cambio se detiene
+                // Este if comprueba si has hecho algún cambio para continuar, si no hay cambio se detiene
                 if (tabla.getValueAt(e.getFirstRow(), e.getColumn()).equals(datos[row][column])) {
                     isReverting = false;
                     return;
@@ -208,6 +211,8 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
 
         add(pBotones);
 
+        Utilidades.ajustarAnchoColumnas(tabla);
+
         // Visible
         setVisible(true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -224,29 +229,17 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
             String seleccion = (String) comboFiltro.getSelectedItem();
 
             // Asigna a una variable el valor del combobox
-            String campoBD;
-            switch (seleccion) {
-                case "DNI":
-                    campoBD = "dni";
-                    break;
-                case "Nombre":
-                    campoBD = "nombre";
-                    break;
-                case "Apellidos":
-                    campoBD = "apellidos";
-                    break;
-                case "Direccion":
-                    campoBD = "direccion";
-                    break;
-                case "Telefono":
-                    campoBD = "telefono";
-                    break;
-                case "Puesto":
-                    campoBD = "puesto";
-                    break;
-                default:
-                    campoBD = null;
-                    break;
+            String campoBD = null;
+            if (seleccion != null) {
+                campoBD = switch (seleccion) {
+                    case "DNI" -> "dni";
+                    case "Nombre" -> "nombre";
+                    case "Apellidos" -> "apellidos";
+                    case "Direccion" -> "direccion";
+                    case "Telefono" -> "telefono";
+                    case "Puesto" -> "puesto";
+                    default -> null;
+                };
             }
 
             // Si es null no hace nada
@@ -281,7 +274,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
             }
         } else if (e.getSource() == aceptar) {
 
-            // Finaliza la edición activa y confirma los cambios para evitar la pérdida del ultimo dato ingresado.
+            // Finaliza la edición activa y confirma los cambios para evitar la pérdida del último dato ingresado.
             if (tabla.isEditing()) {
                 tabla.getCellEditor().stopCellEditing();
             }

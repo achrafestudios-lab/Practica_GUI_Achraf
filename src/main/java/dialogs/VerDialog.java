@@ -2,27 +2,26 @@ package dialogs;
 
 import dao.AccesoTrabajador;
 import exception.BDException;
-import exception.TrabajadorException;
 import modelo.Empresa;
 import modelo.Trabajador;
-import validacion.Validacion;
+import utilidades.Utilidades;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dao.AccesoTrabajador.insertarTrabajador;
-
+/**
+ * Diálogo para visualizar los datos de los trabajadores en una tabla de solo lectura.
+ * Incluye filtro de búsqueda por campo y botón para cerrar la ventana.
+ *
+ * @author usuario
+ */
 public class VerDialog extends JDialog implements ActionListener, ItemListener {
 
 
@@ -82,7 +81,7 @@ public class VerDialog extends JDialog implements ActionListener, ItemListener {
 
 
         // Crea un JTable, cada fila será un trabajador
-        columnas = new String[]{"Identificador", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
+        columnas = new String[]{"ID", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
         datos = empresa.listarTrabajadores();
 
         // Contiene los datos tanto filas como columnas de la tabla
@@ -119,6 +118,8 @@ public class VerDialog extends JDialog implements ActionListener, ItemListener {
 
         add(pBotones);
 
+        Utilidades.ajustarAnchoColumnas(tabla);
+
         // Visible
         setVisible(true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -135,15 +136,18 @@ public class VerDialog extends JDialog implements ActionListener, ItemListener {
             String seleccion = (String) comboFiltro.getSelectedItem();
 
             // Asigna a una variable el valor del combobox
-            String campoBD = switch (seleccion) {
-                case "DNI" -> "dni";
-                case "Nombre" -> "nombre";
-                case "Apellidos" -> "apellidos";
-                case "Direccion" -> "direccion";
-                case "Telefono" -> "telefono";
-                case "Puesto" -> "puesto";
-                default -> null;
-            };
+            String campoBD = null;
+            if (seleccion != null) {
+                campoBD = switch (seleccion) {
+                    case "DNI" -> "dni";
+                    case "Nombre" -> "nombre";
+                    case "Apellidos" -> "apellidos";
+                    case "Direccion" -> "direccion";
+                    case "Telefono" -> "telefono";
+                    case "Puesto" -> "puesto";
+                    default -> null;
+                };
+            }
 
             // Si es null no hace nada
             if (campoBD == null) return;

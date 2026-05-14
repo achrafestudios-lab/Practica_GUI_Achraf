@@ -23,13 +23,14 @@ import dao.AccesoTrabajador;
 import exception.BDException;
 import modelo.Empresa;
 import modelo.Trabajador;
+import utilidades.Utilidades;
 
 /**
  * Diálogo para gestionar la baja (eliminación) de trabajadores.
  * Muestra una tabla con los trabajadores y un checkbox en cada fila
  * para seleccionar cuáles eliminar. Incluye filtros de búsqueda.
  *
- * @author usuario
+ * @author ach.dev
  */
 public class BajaDialog extends JDialog implements ActionListener {
 
@@ -202,7 +203,7 @@ public class BajaDialog extends JDialog implements ActionListener {
         add(panelBotones);
 
         // Ajusta el ancho de las columnas al contenido
-        ajustarAnchoColumnas();
+        Utilidades.ajustarAnchoColumnas(tabla);
 
         // Hace visible el diálogo
         setVisible(true);
@@ -269,7 +270,7 @@ public class BajaDialog extends JDialog implements ActionListener {
                 }
 
                 // Ajusta el ancho de las columnas al contenido
-                ajustarAnchoColumnas();
+                Utilidades.ajustarAnchoColumnas(tabla);
 
             } catch (BDException exception) {
                 // Muestra error si falla la búsqueda en base de datos
@@ -352,25 +353,5 @@ public class BajaDialog extends JDialog implements ActionListener {
      * Ajusta el ancho de cada columna de la tabla al tamaño del contenido
      * más ancho (incluyendo el encabezado y todas las celdas de datos).
      */
-    private void ajustarAnchoColumnas() {
-        for (int col = 0; col < tabla.getColumnCount(); col++) {
-            int ancho = 50;
-
-            // Calcula el ancho del encabezado de la columna
-            TableCellRenderer headerRenderer = tabla.getTableHeader().getDefaultRenderer();
-            Component cabecera = headerRenderer.getTableCellRendererComponent(
-                    tabla, tabla.getColumnModel().getColumn(col).getHeaderValue(),
-                    false, false, 0, col);
-            ancho = Math.max(ancho, cabecera.getPreferredSize().width + 4);
-
-            // Calcula el ancho máximo entre todas las celdas de datos
-            for (int row = 0; row < tabla.getRowCount(); row++) {
-                TableCellRenderer renderer = tabla.getCellRenderer(row, col);
-                Component componente = tabla.prepareRenderer(renderer, row, col);
-                ancho = Math.max(ancho, componente.getPreferredSize().width + 4);
-            }
-            tabla.getColumnModel().getColumn(col).setPreferredWidth(ancho);
-        }
-    }
 
 }

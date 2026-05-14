@@ -11,6 +11,10 @@ import java.util.Objects;
  */
 public class Trabajador {
 
+    private static final String SEPARADOR_CSV = ",";
+//    private static final String SEPARADOR_JSON = ":";
+
+
     private int identificador;
     private String dni;
     private String nombre;
@@ -50,6 +54,18 @@ public class Trabajador {
         this.puesto = puesto;
     }
 
+    public Trabajador(String linea) {
+        String[] datos = linea.split(SEPARADOR_CSV);
+        this.identificador = Integer.parseInt(datos[0]);
+        this.dni = datos[1];
+        this.nombre = datos[2];
+        this.apellidos = datos[3];
+        this.direccion = datos[4];
+        this.telefono = datos[5];
+        this.puesto = datos[6];
+
+    }
+
     @Override
     public String toString() {
         return "Trabajador{" +
@@ -62,6 +78,21 @@ public class Trabajador {
                 ", puesto='" + puesto + '}';
     }
 
+    // Se utiliza para escribir el trabajador en un fichero de texto.
+    public String toStringWithSeparatorsCSV() {
+        return this.identificador + SEPARADOR_CSV + this.dni + SEPARADOR_CSV + nombre + SEPARADOR_CSV + apellidos + SEPARADOR_CSV + direccion + SEPARADOR_CSV + this.telefono + SEPARADOR_CSV + puesto;
+    }
+
+    public String toStringWithSeparatorsJSON() {
+        return "{" +
+                "\"identificador\":\"" + identificador + "\"" +
+                ",\"dni\":\"" + dni + "\"" +
+                ",\"nombre\":\"" + nombre + "\"" +
+                ",\"apellidos\":\"" + apellidos + "\"" +
+                ",\"direccion\":\"" + direccion + "\"" +
+                ",\"telefono\":\"" + telefono + "\"" +
+                ",\"puesto\":\"" + puesto + "\"}";
+    }
 
     @Override
     public int hashCode() {
