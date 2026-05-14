@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import dao.AccesoTrabajador;
 import exception.TrabajadorException;
+import ficheros.FicheroJSON;
 import ficheros.FiecheroCSV;
 import modelo.Empresa;
 import modelo.Trabajador;
@@ -229,23 +231,30 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
             }
 
         } else if (e.getSource() == importar) {
-            List<Trabajador> importados = null;
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter("CSV", "csv"));
+            fileChooser.setFileFilter(new FileNameExtensionFilter("CSV y JSON", "csv", "json"));
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                importados = FiecheroCSV.importarFicheroTrabajadores(
-                        fileChooser.getSelectedFile().getAbsolutePath());
+                File f = fileChooser.getSelectedFile();
+                String nombre = f.getAbsolutePath();
+                List<Trabajador> importados;
+
+                if (nombre.endsWith(".json")) {
+                    importados = FicheroJSON.importarFicheroJSON(nombre);
+                } else {
+                    importados = FiecheroCSV.importarFicheroTrabajadores(nombre);
+                }
 
                 try {
                     AccesoTrabajador.insertarListaTrabajadores(importados);
+                    JOptionPane.showMessageDialog(this,
+                            "Importados: " + importados.size() + " trabajadores",
+                            "Completado", JOptionPane.INFORMATION_MESSAGE);
                 } catch (TrabajadorException ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
-            JOptionPane.showMessageDialog(this,
-                    "Se han importado: " + importados.size() + " trabajadores",
-                    "Completado", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else if (e.getSource() == cancelar) {
             dispose();
         }
@@ -258,7 +267,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
      *
      * @return
      */
-    public boolean comprobarErrores() {
+    boolean comprobarErrores() {
 
         areaDni.setBackground(Color.WHITE);
         areaNombre.setBackground(Color.WHITE);

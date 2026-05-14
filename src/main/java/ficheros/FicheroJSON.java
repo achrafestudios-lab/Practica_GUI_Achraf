@@ -2,10 +2,8 @@ package ficheros;
 
 import modelo.Trabajador;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FicheroJSON {
@@ -33,4 +31,31 @@ public class FicheroJSON {
         }
     }
 
+    public static List<Trabajador> importarFicheroJSON(String nombre) {
+        List<Trabajador> trabajadores = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(nombre))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.isEmpty()) continue;
+
+                // Extraer valores del JSON: {"identificador":"X","dni":"Y",...}
+                String[] partes = linea.replaceAll("[{}\"]", "").split(",");
+                String[] valores = new String[7];
+                for (int i = 0; i < partes.length; i++) {
+                    valores[i] = partes[i].split(":")[1];
+                }
+
+                Trabajador t = new Trabajador(
+                        Integer.parseInt(valores[0]),
+                        valores[1], valores[2], valores[3],
+                        valores[4], valores[5], valores[6]
+                );
+                trabajadores.add(t);
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer JSON: " + e.getMessage());
+        }
+        return trabajadores;
+    }
 }
