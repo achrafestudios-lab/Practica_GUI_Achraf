@@ -232,7 +232,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 
         } else if (e.getSource() == importar) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter("CSV y JSON", "csv", "json"));
+            fileChooser.setFileFilter(new FileNameExtensionFilter(".csv .json", "csv", "json"));
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File f = fileChooser.getSelectedFile();
                 String nombre = f.getAbsolutePath();

@@ -1,8 +1,11 @@
 package utilidades;
 
+import modelo.Trabajador;
+
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.util.List;
 
 public class Utilidades {
     public static void ajustarAnchoColumnas(JTable tabla) {
@@ -25,5 +28,17 @@ public class Utilidades {
             tabla.getColumnModel().getColumn(col).setPreferredWidth(ancho);
         }
     }
+    
+    public static void creaFilasFiltradasTrabajadores(List<Trabajador> filtrados, int i, Object[][] datos) {
+        Trabajador trabajador = filtrados.get(i);
+        datos[i][0] = Integer.toString(trabajador.getIdentificador());
+        datos[i][1] = trabajador.getDni();
+        datos[i][2] = trabajador.getNombre();
+        datos[i][3] = trabajador.getApellidos();
+        datos[i][4] = trabajador.getDireccion();
+        datos[i][5] = trabajador.getTelefono();
+        datos[i][6] = trabajador.getPuesto();
+    }
 
 }
+

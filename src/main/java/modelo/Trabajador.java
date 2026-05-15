@@ -6,14 +6,10 @@ package modelo;
 import java.util.Objects;
 
 /**
- * @author alumno
+ * @author ach.dev
  *
  */
 public class Trabajador {
-
-    private static final String SEPARADOR_CSV = ",";
-//    private static final String SEPARADOR_JSON = ":";
-
 
     private int identificador;
     private String dni;
@@ -33,8 +29,7 @@ public class Trabajador {
      * @param puesto
      */
 
-    public Trabajador(int identificador, String dni, String nombre,
-                      String apellidos, String direccion, String telefono, String puesto) {
+    public Trabajador(int identificador, String dni, String nombre, String apellidos, String direccion, String telefono, String puesto) {
         this.identificador = identificador;
         this.dni = dni;
         this.nombre = nombre;
@@ -44,8 +39,7 @@ public class Trabajador {
         this.puesto = puesto;
     }
 
-    public Trabajador(String dni, String nombre,
-                      String apellidos, String direccion, String telefono, String puesto) {
+    public Trabajador(String dni, String nombre, String apellidos, String direccion, String telefono, String puesto) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -54,16 +48,7 @@ public class Trabajador {
         this.puesto = puesto;
     }
 
-    public Trabajador(String linea) {
-        String[] datos = linea.split(SEPARADOR_CSV);
-        this.identificador = Integer.parseInt(datos[0]);
-        this.dni = datos[1];
-        this.nombre = datos[2];
-        this.apellidos = datos[3];
-        this.direccion = datos[4];
-        this.telefono = datos[5];
-        this.puesto = datos[6];
-
+    public Trabajador() {
     }
 
     @Override
@@ -76,22 +61,6 @@ public class Trabajador {
                 ", direccion='" + direccion +
                 ", telefono='" + telefono +
                 ", puesto='" + puesto + '}';
-    }
-
-    // Se utiliza para escribir el trabajador en un fichero de texto.
-    public String toStringWithSeparatorsCSV() {
-        return this.identificador + SEPARADOR_CSV + this.dni + SEPARADOR_CSV + nombre + SEPARADOR_CSV + apellidos + SEPARADOR_CSV + direccion + SEPARADOR_CSV + this.telefono + SEPARADOR_CSV + puesto;
-    }
-
-    public String toStringWithSeparatorsJSON() {
-        return "{" +
-                "\"identificador\":\"" + identificador + "\"" +
-                ",\"dni\":\"" + dni + "\"" +
-                ",\"nombre\":\"" + nombre + "\"" +
-                ",\"apellidos\":\"" + apellidos + "\"" +
-                ",\"direccion\":\"" + direccion + "\"" +
-                ",\"telefono\":\"" + telefono + "\"" +
-                ",\"puesto\":\"" + puesto + "\"}";
     }
 
     @Override

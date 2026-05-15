@@ -242,7 +242,7 @@ public class BajaDialog extends JDialog implements ActionListener {
                     // Crea una matriz de Object (8 columnas: 7 datos + checkbox)
                     datos = new Object[filtrados.size()][8];
                     for (int i = 0; i < filtrados.size(); i++) {
-                        creaFilasFiltradasTrabajadores(filtrados, i, datos);
+                        Utilidades.creaFilasFiltradasTrabajadores(filtrados, i, datos);
                         datos[i][7] = Boolean.FALSE; // Checkbox desmarcado por defecto
                     }
                 }
@@ -338,16 +338,6 @@ public class BajaDialog extends JDialog implements ActionListener {
         return campoBD;
     }
 
-    static void creaFilasFiltradasTrabajadores(List<Trabajador> filtrados, int i, Object[][] datos) {
-        Trabajador trabajador = filtrados.get(i);
-        datos[i][0] = Integer.toString(trabajador.getIdentificador());
-        datos[i][1] = trabajador.getDni();
-        datos[i][2] = trabajador.getNombre();
-        datos[i][3] = trabajador.getApellidos();
-        datos[i][4] = trabajador.getDireccion();
-        datos[i][5] = trabajador.getTelefono();
-        datos[i][6] = trabajador.getPuesto();
-    }
 
     /**
      * Ajusta el ancho de cada columna de la tabla al tamaño del contenido

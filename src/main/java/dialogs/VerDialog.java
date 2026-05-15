@@ -160,7 +160,7 @@ public class VerDialog extends JDialog implements ActionListener, ItemListener {
                     List<Trabajador> filtrados = AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
                     datos = new String[filtrados.size()][7];
                     for (int i = 0; i < filtrados.size(); i++) {
-                        BajaDialog.creaFilasFiltradasTrabajadores(filtrados, i, datos);
+                        Utilidades.creaFilasFiltradasTrabajadores(filtrados, i, datos);
                     }
                 }
 
