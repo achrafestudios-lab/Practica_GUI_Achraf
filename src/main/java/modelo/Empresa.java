@@ -138,6 +138,7 @@ public class Empresa {
     }
 
     public Object[][] listarTrabajadoresCheckBox() {
+        setTrabajadores(obtenerTrabajadoresBaseDatos());
         Object[][] datos = new Object[trabajadores.size()][8];
         for (int i = 0; i < trabajadores.size(); i++) {
             Object[] fila = new Object[8];

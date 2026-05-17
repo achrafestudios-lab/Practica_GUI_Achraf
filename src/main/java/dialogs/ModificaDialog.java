@@ -145,30 +145,33 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         tabla.getModel().addTableModelListener(new TableModelListener() {
 
             @Override
-            public void tableChanged(TableModelEvent e) {
+            public void tableChanged(TableModelEvent evento) {
 
                 // Solo detecta cambios de tipo UPDATE
-                if (e.getType() != TableModelEvent.UPDATE) {
+                if (evento.getType() != TableModelEvent.UPDATE) {
                     return;
                 }
 
                 // Detectamos la fila y columna modificada
-                int row = tabla.convertRowIndexToModel(e.getFirstRow());
-                int column = tabla.convertColumnIndexToModel(e.getColumn());
+                int modelRow = evento.getFirstRow();
+                int modelColumn = evento.getColumn();
+
+                // Convierte la fila de modelos a vista (necesario cuando la tabla está ordenada)
+                int viewRow = tabla.convertRowIndexToView(modelRow);
 
                 // Este if comprueba si has hecho algún cambio para continuar, si no hay cambio se detiene
-                if (tabla.getValueAt(e.getFirstRow(), e.getColumn()).equals(datos[row][column])) {
+                if (tabla.getValueAt(viewRow, evento.getColumn()).equals(datos[modelRow][modelColumn])) {
                     isReverting = false;
                     return;
                 }
 
                 // Obtenemos los valores de toda la fila modificada
-                dni = (String) tabla.getValueAt(row, 1);
-                nombre = (String) tabla.getValueAt(row, 2);
-                apellidos = (String) tabla.getValueAt(row, 3);
-                direccion = (String) tabla.getValueAt(row, 4);
-                telefono = (String) tabla.getValueAt(row, 5);
-                puesto = (String) tabla.getValueAt(row, 6);
+                dni = (String) tabla.getValueAt(viewRow, 1);
+                nombre = (String) tabla.getValueAt(viewRow, 2);
+                apellidos = (String) tabla.getValueAt(viewRow, 3);
+                direccion = (String) tabla.getValueAt(viewRow, 4);
+                telefono = (String) tabla.getValueAt(viewRow, 5);
+                puesto = (String) tabla.getValueAt(viewRow, 6);
 
 
                 // If que comprueba si hay que rebertir los cambios echos
@@ -190,8 +193,7 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
 
                 } else {
                     isReverting = true;
-                    tabla.setValueAt(datos[row][column], e.getFirstRow(), e.getColumn());
-//                    JOptionPane.showMessageDialog(null, "El dato no cumple...");
+                    tabla.setValueAt(datos[modelRow][modelColumn], viewRow, evento.getColumn());//                    JOptionPane.showMessageDialog(null, "El dato no cumple...");
                 }
             }
         });
@@ -222,77 +224,41 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == buscar) {
-            // Asignamos el valor del JTextField
             String texto = busqueda.getText().trim();
-
-            // Almacena el valor del combobox
-            String seleccion = (String) comboFiltro.getSelectedItem();
-
-            // Asigna a una variable el valor del combobox
-            String campoBD = null;
-            if (seleccion != null) {
-                campoBD = switch (seleccion) {
-                    case "DNI" -> "dni";
-                    case "Nombre" -> "nombre";
-                    case "Apellidos" -> "apellidos";
-                    case "Direccion" -> "direccion";
-                    case "Telefono" -> "telefono";
-                    case "Puesto" -> "puesto";
-                    default -> null;
-                };
-            }
-
-            // Si es null no hace nada
+            String campoBD = opcionBuscador();
             if (campoBD == null) return;
 
             try {
-                if (texto.isEmpty()) { // Si esta vacio el texto muestra todo
-                    datos = empresa.listarTrabajadores();
-                } else {
-                    // Creamos una lista con los datos filtrados
-                    List<Trabajador> filtrados = AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
-                    datos = new String[filtrados.size()][7];
-                    for (int i = 0; i < filtrados.size(); i++) {
-                        Utilidades.creaFilasFiltradasTrabajadores(filtrados, i, datos);
-                    }
-                }
-
-                // ESTO ELIMINA TODAS LAS TABLAS DEL MODELO PARA HACER ESPACIO A EL FILTRO
-                modelo.setRowCount(0);
-
-                JOptionPane.showMessageDialog(this,
-                        "Resultados encontrados: " + datos.length,
-                        "Busqueda", JOptionPane.INFORMATION_MESSAGE);
-
-                // Inserta el giltrado a la tabla
-                for (String[] fila : datos) {
-                    modelo.addRow(fila);
-                }
-
+                datos = Utilidades.filtrarTrabajadores(empresa, texto, campoBD);
+                Utilidades.actualizarTabla(modelo, datos, tabla, this);
             } catch (BDException ex) {
                 JOptionPane.showMessageDialog(null, "Error al filtrar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getSource() == aceptar) {
 
-            // Finaliza la edición activa y confirma los cambios para evitar la pérdida del último dato ingresado.
             if (tabla.isEditing()) {
                 tabla.getCellEditor().stopCellEditing();
             }
 
-            int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea guardar los cambios modificados?", "Guardar",
-                    JOptionPane.YES_NO_OPTION);
+            if (trabajadores.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No hay cambios que guardar", "Información", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            int respuesta = JOptionPane.showConfirmDialog(null,
+                    "Se van a modificar " + trabajadores.size() + " trabajadores. ¿Desea guardar los cambios?",
+                    "Guardar", JOptionPane.YES_NO_OPTION);
 
             switch (respuesta) {
                 case JOptionPane.YES_OPTION:
                     try {
                         AccesoTrabajador.actualizarListaTrabajadoresPorDni(trabajadores);
-                        JOptionPane.showMessageDialog(null, "Cambios guardados con exito ", "", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Cambios guardados con éxito", "", JOptionPane.INFORMATION_MESSAGE);
 
                     } catch (TrabajadorException | BDException ex) {
                         System.out.println(ex.getMessage());
                     }
                 case JOptionPane.NO_OPTION:
-                    // Operaciones en caso negativo no hacer nada
                     break;
             }
 
@@ -362,5 +328,14 @@ public class ModificaDialog extends JDialog implements ActionListener, ItemListe
         }
         return true;
     }
+
+    private String opcionBuscador() {
+        String seleccion = (String) comboFiltro.getSelectedItem();
+        if (seleccion != null) {
+            return Utilidades.comboToCampoBD(seleccion);
+        }
+        return null;
+    }
+
 
 }

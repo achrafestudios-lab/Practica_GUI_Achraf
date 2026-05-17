@@ -226,7 +226,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
                 }
 
             } catch (Exception e1) {
-                JOptionPane.showMessageDialog(null, "El ID debe ser un numero entero", "Error",
+                JOptionPane.showMessageDialog(null, e1.getMessage(), "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
 

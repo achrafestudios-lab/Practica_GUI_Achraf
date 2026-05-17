@@ -46,18 +46,7 @@ public class EmpresaGUI extends JFrame implements ActionListener {
         super("Gestión de personal");
 
         // Carga los trabajadores leidos de un fichero a memoria
-        ArrayList<Trabajador> trabajDAT = FicheroDatos.obtenerTrabajadores(rutaArchivoDat);
-
-//		try {
-//			cargarDatosFicheroEnBaseDatos(trabajDAT);
-//
-//		} catch (TrabajadorException e) {
-//			throw new RuntimeException(e);
-//		}
-
-
-//		escribirTrabajadores(rutaArchivoDat, obtenerTrabajadoresBaseDatos());
-
+//        ArrayList<Trabajador> trabajDAT = FicheroDatos.obtenerTrabajadores(rutaArchivoDat);
 
         empresa = new Empresa(trabaj);
 

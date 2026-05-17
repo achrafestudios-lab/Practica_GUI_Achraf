@@ -16,7 +16,6 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 // Importación de clases del modelo, DAO y excepciones
 import dao.AccesoTrabajador;
@@ -154,6 +153,7 @@ public class BajaDialog extends JDialog implements ActionListener {
                 // Obtiene la fila y columna modificada en coordenadas de MODELO
                 int modelRow = evento.getFirstRow();
                 int modelColumn = evento.getColumn();
+
                 // Convierte la fila de modelos a vista (necesario cuando la tabla está ordenada)
                 int viewRow = tabla.convertRowIndexToView(modelRow);
 
@@ -226,7 +226,7 @@ public class BajaDialog extends JDialog implements ActionListener {
             String texto = busqueda.getText().trim();
 
             // Obtiene el campo seleccionado en el combo de filtro
-            String campoBD = getString();
+            String campoBD = opcionBuscador();
 
             // Si el campo no es válido, no hace nada
             if (campoBD == null) return;
@@ -319,29 +319,17 @@ public class BajaDialog extends JDialog implements ActionListener {
         }
     }
 
-    private String getString() {
+    private String opcionBuscador() {
         String seleccion = (String) comboFiltro.getSelectedItem();
 
         // Convierte el nombre visible del campo al nombre real de la columna en BD
         String campoBD = null;
         if (seleccion != null) {
-            campoBD = switch (seleccion) {
-                case "DNI" -> "dni";
-                case "Nombre" -> "nombre";
-                case "Apellidos" -> "apellidos";
-                case "Dirección" -> "dirección";
-                case "Teléfono" -> "teléfono";
-                case "Puesto" -> "puesto";
-                default -> null;
-            };
+            campoBD = Utilidades.comboToCampoBD(seleccion);
         }
+        ;
         return campoBD;
+
     }
-
-
-    /**
-     * Ajusta el ancho de cada columna de la tabla al tamaño del contenido
-     * más ancho (incluyendo el encabezado y todas las celdas de datos).
-     */
 
 }

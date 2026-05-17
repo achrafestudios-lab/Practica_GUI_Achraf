@@ -47,7 +47,7 @@ public class VerDialog extends JDialog implements ActionListener, ItemListener {
         setResizable(false);
 
         // Titulo del dialog
-        setTitle("Modificado Trabajadores");
+        setTitle("Buscar Trabajadores");
 
         // Tamaño
         setSize(750, 700);
