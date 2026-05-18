@@ -24,7 +24,7 @@ public class FiecheroCSV {
 
     }
 
-    public static List<Trabajador> importarFicheroTrabajadores(String nombreFichero) {
+    public static List<Trabajador> importarFicheroTrabajadoresCSV(String nombreFichero) {
         List<Trabajador> lista = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new FileReader(nombreFichero))) {
             String[] lineas;

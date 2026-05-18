@@ -4,30 +4,25 @@ package gui;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import dialogs.*;
-//import dialogs.ModificaDialog;
-//import dialogs.VerDialog;
-import exception.TrabajadorException;
 import ficheros.FicheroDatos;
 import modelo.Empresa;
 import modelo.Trabajador;
 
-import static dao.AccesoTrabajador.insertarListaTrabajadores;
 import static dao.AccesoTrabajador.obtenerTrabajadoresBaseDatos;
-import static ficheros.FicheroDatos.*;
 
 
 /**
- *
  * @author Achraf Ait
- *
  */
 public class EmpresaGUI extends JFrame implements ActionListener {
     String rutaArchivoDat = "src\\main\\resources\\ficheroDatos\\empresa.dat";
@@ -45,15 +40,18 @@ public class EmpresaGUI extends JFrame implements ActionListener {
     public EmpresaGUI() {
         super("Gestión de personal");
 
-        // Carga los trabajadores leidos de un fichero a memoria
-//        ArrayList<Trabajador> trabajDAT = FicheroDatos.obtenerTrabajadores(rutaArchivoDat);
-
         empresa = new Empresa(trabaj);
 
         // Tamaño JFrame
         setSize(800, 750);
         // Cerrar al salir
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                confirmarSalida();
+            }
+        });
         setLayout(new GridLayout(3, 2));
         setLocationRelativeTo(null);
         // Creación de los botones y se añaden al JFrame
@@ -99,7 +97,7 @@ public class EmpresaGUI extends JFrame implements ActionListener {
         // e implementa el método actionPerformed() pasando como parámetro un
         // ActionEvent.
         if (e.getSource() == altaTrabajador) {
-            new AltaDialog(empresa);
+            new AltaDialog();
         } else if (e.getSource() == bajaTrabajador) {
             new BajaDialog(empresa);
         } else if (e.getSource() == modificaTrabajador) {
@@ -112,12 +110,16 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 
         // Cuando se sale se vuelca a fichero.
         else if (e.getSource() == salir) {
+            confirmarSalida();
+        }
+    }
+
+    private void confirmarSalida() {
+        int opcion = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que quieres salir?", "Confirmar salida",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (opcion == JOptionPane.YES_OPTION) {
             FicheroDatos.escribirTrabajadores(rutaArchivoDat, empresa.getTrabajadores());
-//            try {
-//                insertarListaTrabajadores(trabaj);
-//            } catch (TrabajadorException ex) {
-//				System.out.println(ex.getMessage());;
-//            }
             System.exit(0);
         }
     }

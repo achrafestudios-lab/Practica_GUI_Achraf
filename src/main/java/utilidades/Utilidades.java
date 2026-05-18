@@ -55,14 +55,33 @@ public class Utilidades {
         };
     }
 
-    public static String[][] filtrarTrabajadores(
-            Empresa empresa, String texto, String campoBD) {
+    public static JComboBox<String> crearComboFiltro() {
+        JComboBox<String> combo = new JComboBox<>();
+        combo.addItem("DNI");
+        combo.addItem("Nombre");
+        combo.addItem("Apellidos");
+        combo.addItem("Direccion");
+        combo.addItem("Telefono");
+        combo.addItem("Puesto");
+        return combo;
+    }
+
+    public static JComboBox<String> crearComboPuestos() {
+        JComboBox<String> combo = new JComboBox<>();
+        combo.addItem("Elija Puessto");
+        combo.addItem("Programador");
+        combo.addItem("Analista");
+        combo.addItem("Arquitecto");
+        combo.addItem("Jefe de Proyecto");
+        return combo;
+    }
+
+    public static String[][] filtrarTrabajadores(Empresa empresa, String texto, String campoBD) {
 
         if (texto.isEmpty()) {
             return empresa.listarTrabajadores();
         }
-        List<Trabajador> filtrados =
-                AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
+        List<Trabajador> filtrados = AccesoTrabajador.obtenerTrabajadoresFiltrados(campoBD, texto);
         String[][] datos = new String[filtrados.size()][7];
         for (int i = 0; i < filtrados.size(); i++) {
             creaFilasFiltradasTrabajadores(filtrados, i, datos);
@@ -80,5 +99,10 @@ public class Utilidades {
         }
         ajustarAnchoColumnas(tabla);
     }
+
+    public static final String[] COLUMNAS_TRABAJADORES =
+            {"ID", "DNI", "Nombre", "Apellidos", "Direccion", "Telefono", "Puesto"};
+
+
 }
 
